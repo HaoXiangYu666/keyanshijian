@@ -31,26 +31,7 @@
   </div>
 
   <template v-else>
-    <div class="grid cols-4 stagger">
-      <div class="stat">
-        <div class="n count">{{ num(totals.units) }}</div>
-        <div class="l">内容单元</div>
-      </div>
-      <div class="stat">
-        <div class="n count">{{ num(totals.formulas) }}</div>
-        <div class="l">方剂</div>
-      </div>
-      <div class="stat">
-        <div class="n count">{{ num(totals.cases) }}</div>
-        <div class="l">医案</div>
-      </div>
-      <div class="stat">
-        <div class="n count">{{ num(totals.quotes) }}</div>
-        <div class="l">条文</div>
-      </div>
-    </div>
-
-    <div class="grid cols-2" style="margin-top:18px">
+    <div class="grid cols-2">
       <!-- 用药频次 -->
       <section class="card">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
