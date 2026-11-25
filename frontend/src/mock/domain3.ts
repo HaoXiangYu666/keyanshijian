@@ -30,7 +30,7 @@ export interface GEdge {
 
 /** 节点类型配色（与 theme.css 的色板一致，新增类型请复用这套 token） */
 export const NODE_STYLE: Record<NodeLabel, { fill: string; stroke: string; text: string; cs: string }> = {
-  Formula: { fill: '#E6F2EF', stroke: '#2E7D6F', text: '#1F5C52', cs: 'primary' },
+  Formula: { fill: 'rgba(10,132,255,.14)', stroke: '#0A84FF', text: '#0060DF', cs: 'primary' },
   Herb: { fill: '#EAF2FC', stroke: '#3B7DD8', text: '#2A5DA0', cs: 'info' },
   Syndrome: { fill: '#FBEDE7', stroke: '#D9724E', text: '#B4552F', cs: 'accent' },
   Symptom: { fill: '#E9F3F2', stroke: '#4F8A8B', text: '#376566', cs: '' }
@@ -145,7 +145,7 @@ export const DEMO_MAP: MapCluster[] = [
   {
     name: '麻黄类',
     note: '辛温解表',
-    color: '#2E7D6F',
+    color: '#0A84FF',
     points: [
       { name: '麻黄汤', x: 268, y: 186, r: 32 },
       { name: '葛根汤', x: 322, y: 232, r: 27 },

@@ -2,28 +2,39 @@
    见 docs/04_视觉设计规范.md */
 
 :root{
-  --primary:#2E7D6F; --primary-deep:#1F5C52; --primary-soft:#E6F2EF;
-  --accent:#D9724E; --accent-soft:#FBEDE7; --gold:#C8A96A;
-  --bg:#FAFAF8; --surface:#FFFFFF; --surface-2:#F4F4F0;
-  --border:#ECECE8; --border-strong:#D9DED9;
-  --text:#1F2328; --text-2:#6B7280; --text-3:#9AA0A6;
-  --success:#2E9E6B; --success-soft:#E7F5EE;
-  --warning:#D9A441; --warning-soft:#FBF3DF;
-  --error:#C0453A; --error-soft:#FAEAE8;
-  --info:#3B7DD8; --info-soft:#EAF2FC;
-  --radius-sm:6px; --radius:10px; --radius-lg:16px;
-  --shadow-1:0 1px 2px rgba(20,30,25,.04);
-  --shadow-2:0 6px 20px rgba(20,30,25,.08);
-  --shadow-3:0 14px 40px rgba(20,30,25,.12);
+  /* Apple Store 蓝 + 毛玻璃皮肤：全局换色，一处覆盖所有页面 */
+  --primary:#0A84FF; --primary-deep:#0060DF; --primary-soft:rgba(10,132,255,.12);
+  --accent:#5E5CE6; --accent-soft:rgba(94,92,230,.12); --gold:#32ADE6;
+  --bg:transparent; --surface:rgba(255,255,255,.62); --surface-2:rgba(255,255,255,.40);
+  --border:rgba(255,255,255,.55); --border-strong:rgba(255,255,255,.72);
+  --text:#0B2545; --text-2:#3C5A7E; --text-3:#6C88AA;
+  --success:#34C759; --success-soft:rgba(52,199,89,.14);
+  --warning:#FF9F0A; --warning-soft:rgba(255,159,10,.14);
+  --error:#FF453A; --error-soft:rgba(255,69,58,.13);
+  --info:#0A84FF; --info-soft:rgba(10,132,255,.12);
+  --radius-sm:8px; --radius:14px; --radius-lg:22px;
+  --shadow-1:0 2px 10px rgba(6,42,90,.08);
+  --shadow-2:0 10px 30px rgba(6,42,90,.14);
+  --shadow-3:0 20px 50px rgba(6,42,90,.22);
   --ease:cubic-bezier(.22,.61,.36,1);
   --maxw:1200px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+  /* Apple 蓝：固定渐层 + 柔和光斑，滚动时背景不动 */
+  background-color:#0A84FF;
+  background-image:
+    radial-gradient(1100px 760px at 8% -6%, rgba(255,255,255,.30), transparent 62%),
+    radial-gradient(900px 680px at 92% 14%, rgba(120,220,255,.42), transparent 60%),
+    radial-gradient(1100px 820px at 72% 106%, rgba(8,74,200,.42), transparent 62%),
+    linear-gradient(150deg,#0A84FF 0%,#0A72E8 42%,#0058C9 100%);
+  background-attachment:fixed;
+}
 body{
-  font-family:'Noto Sans SC','Microsoft YaHei',system-ui,sans-serif;
-  background:var(--bg); color:var(--text); font-size:15px; line-height:1.7;
+  font-family:-apple-system,BlinkMacSystemFont,'Noto Sans SC','Microsoft YaHei',system-ui,sans-serif;
+  background:transparent; color:var(--text); font-size:15px; line-height:1.7;
   -webkit-font-smoothing:antialiased;
 }
 h1,h2,h3,h4,.serif{font-family:'Noto Serif SC','Songti SC',Georgia,serif;line-height:1.35}
@@ -240,11 +251,11 @@ footer a{color:var(--text-2)}
 
 /* ---------- 登录 / 认证 ---------- */
 .auth{display:grid;grid-template-columns:1.05fr .95fr;min-height:100vh}
-.auth-brand{background:linear-gradient(135deg,#1F5C52,#2E7D6F);color:#fff;padding:56px 52px;
+.auth-brand{background:linear-gradient(135deg,#0A84FF,#0058C9);color:#fff;padding:56px 52px;
   display:flex;flex-direction:column;justify-content:center;gap:18px;position:relative;overflow:hidden}
 .auth-brand::before{content:"";position:absolute;inset:0;opacity:.5;
-  background-image:radial-gradient(circle at 15% 22%,rgba(255,255,255,.16),transparent 42%),
-                   radial-gradient(circle at 85% 82%,rgba(200,169,106,.22),transparent 45%)}
+  background-image:radial-gradient(circle at 15% 22%,rgba(255,255,255,.2),transparent 42%),
+                   radial-gradient(circle at 85% 82%,rgba(120,220,255,.28),transparent 45%)}
 .auth-brand>*{position:relative}
 .auth-brand .logo-lg{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.16);
   display:grid;place-items:center;font-family:'Noto Serif SC',serif;font-weight:800;font-size:22px}
@@ -271,3 +282,86 @@ footer a{color:var(--text-2)}
 .dropzone:hover{border-color:var(--primary);background:var(--primary-soft)}
 .dropzone .ic{font-size:34px}
 .dropzone .hint{color:var(--text-3);font-size:12.5px;margin-top:6px}
+
+/* ============================================================
+   Apple Store 蓝 · 毛玻璃皮肤（统一覆盖所有页面）
+   设计：半透明磨砂面板 + 细白边 + 柔和投影，字色更深保证可读
+   ============================================================ */
+:root{
+  --glass:rgba(255,255,255,.58);
+  --glass-strong:rgba(255,255,255,.74);
+  --glass-line:rgba(255,255,255,.62);
+  --glass-blur:saturate(170%) blur(22px);
+  --glass-shadow:0 10px 36px rgba(4,48,110,.16),inset 0 1px 0 rgba(255,255,255,.55);
+}
+
+/* 顶栏：毛玻璃 */
+.topbar{
+  background:rgba(255,255,255,.44)!important;
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border-bottom:1px solid rgba(255,255,255,.55)!important;
+  box-shadow:0 6px 24px rgba(4,48,110,.08);
+}
+.topbar .nav a.active{color:var(--primary-deep)}
+
+/* 通用面板：卡片 / 统计 / 列表项 / 书卡 / 工具卡 / 步骤 / 气泡 / 抽屉 */
+.card,.stat,.rowitem,.bookcard,.toolcard,.steps .st,.bubble.ai,
+.cite,.pill-tabs,.dropzone,.field .input,textarea.input,.input,.booksel{
+  background:var(--glass)!important;
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-line)!important;
+  box-shadow:var(--glass-shadow);
+}
+.card.link:hover,.bookcard:hover,.rowitem:hover{
+  border-color:rgba(255,255,255,.9)!important;
+  box-shadow:0 16px 40px rgba(4,48,110,.22),inset 0 1px 0 rgba(255,255,255,.6);
+}
+
+/* 主按钮：实心 Apple 蓝；幽灵按钮：磨砂 */
+.btn.primary{
+  background:linear-gradient(180deg,#3AA0FF,#0A84FF)!important;color:#fff!important;
+  box-shadow:0 8px 20px rgba(10,132,255,.38);border:1px solid rgba(255,255,255,.35)!important;
+}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.ghost,.steps .st,.pill-tabs{
+  background:var(--glass)!important;
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-line)!important;color:var(--text)!important;
+}
+.pill-tabs button.active{background:rgba(255,255,255,.85)!important}
+
+/* Chip：磨砂胶囊 */
+.chip,.badge{background:rgba(255,255,255,.5)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.chip.primary{color:var(--primary-deep)!important;border-color:rgba(10,132,255,.35)!important}
+.chip.sel,.role.jun{background:var(--primary)!important;color:#fff!important;border-color:transparent!important}
+
+/* 输入 / 选择：磨砂通透 */
+.input,textarea.input,.booksel{color:var(--text)!important}
+.input:focus{background:rgba(255,255,255,.8)!important;box-shadow:0 0 0 4px rgba(10,132,255,.22)!important}
+
+/* 表格：磨砂表头与悬浮 */
+table.tb th{background:rgba(255,255,255,.42)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+table.tb tr:hover td{background:rgba(255,255,255,.4)!important}
+
+/* Hero / 统计数字：蓝色调 */
+.hero{background:var(--glass)!important;-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+.hero h1{color:var(--primary-deep)}
+.stat .n{color:var(--primary-deep)!important}
+.section-title .dot{background:var(--primary)!important}
+
+/* 朗读/对话气泡 */
+.bubble.me{background:linear-gradient(180deg,#3AA0FF,#0A84FF)!important;color:#fff!important}
+.typing::after{color:var(--primary)!important}
+
+/* 抽屉与遮罩：更透的磨砂 */
+.drawer{background:rgba(248,252,255,.9)!important;-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+.overlay{background:rgba(6,42,90,.32)!important}
+
+/* Toast 深色保留，但加圆角玻璃感 */
+.toast{background:rgba(11,37,69,.92)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18)}
+
+/* 滚动条：浅色 */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.45);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.7);background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}

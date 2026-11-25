@@ -86,8 +86,8 @@ import { getBooks, type Book } from '@/api/catalog'
 
 /** 封面渐变（与 shelf.html 一致，按索引轮换） */
 const covers = [
-  'linear-gradient(135deg,#2E7D6F,#1F5C52)',
-  'linear-gradient(135deg,#3B7DD8,#2A5DA0)',
+  'linear-gradient(135deg,#0A84FF,#0058C9)',
+  'linear-gradient(135deg,#32ADE6,#0071E3)',
   'linear-gradient(135deg,#C8A96A,#8A6D3B)',
   'linear-gradient(135deg,#7A6BB5,#5B4E92)',
   'linear-gradient(135deg,#4F8A8B,#376566)'

@@ -24,7 +24,7 @@
     <p class="muted" style="margin-top:6px">{{ error }}</p>
     <p class="muted" style="margin-top:6px">
       可以改用方剂 ID（如 <span class="mono">f_1</span>），或从
-      <RouterLink to="/graph" style="color:#2E7D6F">图谱探索</RouterLink> 里点一个方剂进来。
+      <RouterLink to="/graph" style="color:#0A84FF">图谱探索</RouterLink> 里点一个方剂进来。
     </p>
   </div>
 

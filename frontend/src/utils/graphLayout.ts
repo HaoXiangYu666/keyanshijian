@@ -217,7 +217,7 @@ export function layoutMap(data: GraphMapVO): Array<GNode & { cluster: string }> 
  * 这是**画法**上的取舍，不改数据：每首方的 cluster 值仍原样保留在抽屉里。
  */
 const PALETTE = [
-  '#2E7D6F',
+  '#0A84FF',
   '#3B7DD8',
   '#D9724E',
   '#8A6FB0',

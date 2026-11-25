@@ -508,7 +508,9 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   font: inherit;
   color: inherit;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .scope {

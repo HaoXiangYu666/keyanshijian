@@ -450,13 +450,15 @@ onMounted(load)
   z-index: 999;
   width: 300px;
   padding: 12px 14px;
-  border: 1px solid #dde7e2;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.74);
+  -webkit-backdrop-filter: saturate(170%) blur(22px);
+  backdrop-filter: saturate(170%) blur(22px);
+  box-shadow: 0 12px 30px rgba(4, 48, 110, 0.2);
   font-size: 13px;
   line-height: 1.65;
-  color: #333;
+  color: var(--text, #0b2545);
   pointer-events: none;
 }
 

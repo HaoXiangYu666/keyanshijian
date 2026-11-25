@@ -88,21 +88,21 @@ const edgeLines = computed(() =>
 )
 
 function fillOf(type: string) {
-  if (type === 'Formula') return '#E6F2EF'
+  if (type === 'Formula') return 'rgba(10,132,255,.14)'
   if (type === 'Herb') return '#EAF2FC'
   if (type === 'Syndrome') return '#FBEDE7'
   return '#E9F3F2'
 }
 
 function strokeOf(type: string) {
-  if (type === 'Formula') return '#2E7D6F'
+  if (type === 'Formula') return '#0A84FF'
   if (type === 'Herb') return '#3B7DD8'
   if (type === 'Syndrome') return '#D9724E'
   return '#4F8A8B'
 }
 
 function textOf(type: string) {
-  if (type === 'Formula') return '#1F5C52'
+  if (type === 'Formula') return '#0060DF'
   if (type === 'Herb') return '#2A5DA0'
   if (type === 'Syndrome') return '#B4552F'
   return '#376566'
