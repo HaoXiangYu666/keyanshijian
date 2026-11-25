@@ -35,7 +35,12 @@
       </div>
     </section>
 
-    <!-- 功能模块：图标更蓝、卡片更大、间隔更大 -->
+    <!-- 功能模块：与横幅同宽、卡片更大更醒目 -->
+    <div class="section-title">
+      <span class="bar"></span>
+      <h2>功能导航</h2>
+      <p>选择一个模块开始</p>
+    </div>
     <section class="portal-grid" aria-label="功能模块">
       <RouterLink
         v-for="m in modules"
@@ -88,63 +93,70 @@ const modules: Array<{ name: string; to: string; color: string; paths: string[] 
 </script>
 
 <style scoped>
-.portal { padding: clamp(20px, 3.4vw, 40px) clamp(16px, 5vw, 56px) 64px; }
+.portal { max-width:1320px;margin:0 auto;padding:clamp(20px,3vw,36px) clamp(16px,4vw,44px) 64px; }
 
 /* 读书横幅 */
 .banner{
   position:relative;overflow:hidden;
-  min-height:230px;display:flex;align-items:center;
-  padding:36px clamp(24px,4vw,52px);
-  border-radius:26px;color:#fff;
+  min-height:268px;display:flex;align-items:center;
+  padding:44px clamp(28px,4.5vw,64px);
+  border-radius:28px;color:#fff;
   background:linear-gradient(120deg,#1E9BF0 0%,#0A84FF 52%,#0060DF 100%);
-  box-shadow:0 18px 44px rgba(10,110,220,.28);
+  box-shadow:0 22px 54px rgba(10,110,220,.32);
 }
 .banner::before{content:"";position:absolute;width:360px;height:360px;right:-70px;top:-170px;border-radius:50%;background:rgba(255,255,255,.10)}
 .banner::after{content:"";position:absolute;width:240px;height:240px;right:230px;bottom:-160px;border-radius:50%;background:rgba(255,255,255,.08)}
-.banner-copy{position:relative;z-index:2;max-width:620px}
-.banner-kicker{font-size:12px;letter-spacing:3px;opacity:.85;margin-bottom:12px}
-.banner h1{margin:0;font-size:clamp(30px,4vw,46px);letter-spacing:2px;color:#fff}
+.banner-copy{position:relative;z-index:2;max-width:680px}
+.banner-kicker{font-size:13px;letter-spacing:3px;opacity:.88;margin-bottom:14px}
+.banner h1{margin:0;font-size:clamp(34px,4.4vw,54px);letter-spacing:2px;color:#fff}
 .banner h1 span{color:#FFE36E}
-.banner p{margin:8px 0 0;font-size:15px;opacity:.92}
-.banner-search{display:flex;align-items:center;gap:8px;margin-top:20px;max-width:540px;
-  background:rgba(255,255,255,.97);border-radius:999px;padding:6px 6px 6px 18px;
-  box-shadow:0 6px 20px rgba(4,48,110,.2)}
-.banner-search svg{width:20px;height:20px;fill:none;stroke:#8AA0B8;stroke-width:2;stroke-linecap:round;flex:none}
-.banner-search input{flex:1;min-width:0;border:0;outline:none;font-size:14px;color:var(--text);background:transparent}
+.banner p{margin:10px 0 0;font-size:17px;opacity:.94}
+.banner-search{display:flex;align-items:center;gap:10px;margin-top:26px;max-width:660px;
+  background:rgba(255,255,255,.98);border-radius:999px;padding:7px 7px 7px 22px;
+  box-shadow:0 10px 28px rgba(4,48,110,.26)}
+.banner-search svg{width:23px;height:23px;fill:none;stroke:#8AA0B8;stroke-width:2;stroke-linecap:round;flex:none}
+.banner-search input{flex:1;min-width:0;border:0;outline:none;font-size:16px;color:var(--text);background:transparent}
 .banner-search input::placeholder{color:#9AAEC2}
-.banner-search button{border:0;border-radius:999px;padding:10px 24px;font-weight:700;color:#fff;
+.banner-search button{border:0;border-radius:999px;padding:13px 34px;font-size:15px;font-weight:700;color:#fff;
   background:linear-gradient(180deg,#3AA0FF,#0A6FE8);cursor:pointer;white-space:nowrap}
 .banner-search button:hover{filter:brightness(1.06)}
-.banner-art{position:absolute;right:24px;bottom:6px;width:clamp(240px,32vw,400px);z-index:1}
+.banner-art{position:absolute;right:30px;bottom:10px;width:clamp(260px,32vw,420px);z-index:1}
 .banner-art svg{width:100%;height:auto;display:block}
 
-/* 功能模块 */
+/* 分区标题 */
+.section-title{display:flex;align-items:center;gap:12px;margin:clamp(28px,3.6vw,42px) 4px 20px}
+.section-title .bar{width:5px;height:24px;border-radius:3px;background:linear-gradient(180deg,#3AA0FF,#0A6FE8)}
+.section-title h2{margin:0;font-size:22px;color:var(--primary-deep);letter-spacing:1px}
+.section-title p{margin:0;color:var(--text-3);font-size:14px}
+
+/* 功能模块：铺满、与横幅同宽 */
 .portal-grid{
-  max-width:1180px;margin:clamp(26px,3.4vw,40px) auto 0;
+  margin:0;
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:clamp(18px,2.4vw,32px);
+  gap:clamp(18px,2.2vw,30px);
 }
 .portal-card{
-  min-height:200px;padding:28px 18px;border-radius:24px;
-  background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.85);
-  -webkit-backdrop-filter:saturate(170%) blur(22px);backdrop-filter:saturate(170%) blur(22px);
-  box-shadow:0 14px 36px rgba(10,110,220,.14),inset 0 1px 0 rgba(255,255,255,.9);
-  text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  min-height:238px;padding:34px 20px;border-radius:26px;
+  background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);
+  -webkit-backdrop-filter:saturate(170%) blur(24px);backdrop-filter:saturate(170%) blur(24px);
+  box-shadow:0 16px 40px rgba(10,110,220,.16),inset 0 1px 0 rgba(255,255,255,.95);
+  text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
   transition:transform .22s var(--ease),box-shadow .22s var(--ease),background .22s var(--ease);
 }
-.portal-card:hover{transform:translateY(-9px);background:rgba(255,255,255,.85);
-  box-shadow:0 24px 50px rgba(10,110,220,.24),inset 0 1px 0 rgba(255,255,255,.95)}
-.portal-icon{width:78px;height:78px;border-radius:22px;display:grid;place-items:center;
-  box-shadow:0 12px 26px rgba(10,110,220,.28),inset 0 1px 0 rgba(255,255,255,.45)}
-.portal-icon svg{width:40px;height:40px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.portal-card b{font-size:20px;letter-spacing:4px;color:var(--primary-deep)}
+.portal-card:hover{transform:translateY(-10px);background:rgba(255,255,255,.9);
+  box-shadow:0 28px 56px rgba(10,110,220,.26),inset 0 1px 0 rgba(255,255,255,1)}
+.portal-icon{width:92px;height:92px;border-radius:26px;display:grid;place-items:center;
+  box-shadow:0 14px 30px rgba(10,110,220,.3),inset 0 1px 0 rgba(255,255,255,.5)}
+.portal-icon svg{width:48px;height:48px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.portal-card b{font-size:23px;letter-spacing:5px;color:var(--primary-deep)}
 
-@media(max-width:1000px){.portal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.banner-art{width:280px;opacity:.9}}
+@media(max-width:1000px){.portal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.banner-art{width:300px;opacity:.92}}
 @media(max-width:620px){
   .banner{padding:28px 22px}.banner-art{display:none}.banner-search{padding-left:14px}
+  .banner-search button{padding:11px 22px}
   .portal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-  .portal-card{min-height:150px;padding:18px 10px;gap:12px}
-  .portal-icon{width:60px;height:60px;border-radius:18px}.portal-icon svg{width:32px;height:32px}
-  .portal-card b{font-size:17px;letter-spacing:3px}
+  .portal-card{min-height:160px;padding:20px 10px;gap:12px}
+  .portal-icon{width:66px;height:66px;border-radius:20px}.portal-icon svg{width:34px;height:34px}
+  .portal-card b{font-size:18px;letter-spacing:3px}
 }
 </style>

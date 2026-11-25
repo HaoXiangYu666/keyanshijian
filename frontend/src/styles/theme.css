@@ -23,13 +23,13 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{
   scroll-behavior:smooth;
-  /* 淡蓝白背景：大面积留白，蓝色收敛到横幅/图标上，滚动时背景不动 */
-  background-color:#EAF3FB;
+  /* 明亮蓝背景：比纯白更蓝、但不刺眼，滚动时背景不动 */
+  background-color:#CFE3F8;
   background-image:
-    radial-gradient(1100px 760px at 8% -6%, rgba(255,255,255,.85), transparent 62%),
-    radial-gradient(900px 680px at 92% 14%, rgba(140,205,255,.22), transparent 60%),
-    radial-gradient(1100px 820px at 72% 106%, rgba(10,132,255,.10), transparent 62%),
-    linear-gradient(150deg,#F4F9FE 0%,#EAF3FB 45%,#DDEBFA 100%);
+    radial-gradient(1100px 760px at 8% -6%, rgba(255,255,255,.55), transparent 62%),
+    radial-gradient(900px 680px at 92% 14%, rgba(120,195,255,.38), transparent 60%),
+    radial-gradient(1100px 820px at 72% 106%, rgba(10,132,255,.18), transparent 62%),
+    linear-gradient(150deg,#E4F1FD 0%,#CFE3F8 45%,#B4D4F5 100%);
   background-attachment:fixed;
 }
 body{
