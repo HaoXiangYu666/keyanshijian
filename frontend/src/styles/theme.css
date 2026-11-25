@@ -23,13 +23,13 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{
   scroll-behavior:smooth;
-  /* Apple 蓝：固定渐层 + 柔和光斑，滚动时背景不动 */
-  background-color:#0A84FF;
+  /* 淡蓝白背景：大面积留白，蓝色收敛到横幅/图标上，滚动时背景不动 */
+  background-color:#EAF3FB;
   background-image:
-    radial-gradient(1100px 760px at 8% -6%, rgba(255,255,255,.30), transparent 62%),
-    radial-gradient(900px 680px at 92% 14%, rgba(120,220,255,.42), transparent 60%),
-    radial-gradient(1100px 820px at 72% 106%, rgba(8,74,200,.42), transparent 62%),
-    linear-gradient(150deg,#0A84FF 0%,#0A72E8 42%,#0058C9 100%);
+    radial-gradient(1100px 760px at 8% -6%, rgba(255,255,255,.85), transparent 62%),
+    radial-gradient(900px 680px at 92% 14%, rgba(140,205,255,.22), transparent 60%),
+    radial-gradient(1100px 820px at 72% 106%, rgba(10,132,255,.10), transparent 62%),
+    linear-gradient(150deg,#F4F9FE 0%,#EAF3FB 45%,#DDEBFA 100%);
   background-attachment:fixed;
 }
 body{
@@ -362,6 +362,28 @@ table.tb tr:hover td{background:rgba(255,255,255,.4)!important}
 
 /* 滚动条：浅色 */
 ::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.45);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
-::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.7);background-clip:padding-box}
+::-webkit-scrollbar-thumb{background:rgba(10,132,255,.28);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(10,132,255,.45);background-clip:padding-box}
 ::-webkit-scrollbar-track{background:transparent}
+
+/* ---------- 全局返回键（所有子页统一，替代原导航栏） ---------- */
+.backbar{
+  position:sticky;top:0;z-index:90;
+  padding:12px clamp(16px,5vw,40px);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:rgba(255,255,255,.42);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border-bottom:1px solid rgba(255,255,255,.5);
+}
+.backbar .back{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:999px;font-size:14px;font-weight:600;
+  color:var(--primary-deep);text-decoration:none;
+  background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 4px 14px rgba(4,48,110,.1);transition:.16s var(--ease);
+}
+.backbar .back:hover{background:#fff;transform:translateX(-2px)}
+.backbar .brandmini{font-weight:800;letter-spacing:1px;color:var(--primary-deep);font-size:15px}
+
+/* 子页面统一容器：顶部留白给返回键 */
+.subpage{max-width:var(--maxw);margin:0 auto;padding:26px clamp(16px,5vw,40px) 60px}

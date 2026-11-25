@@ -1,244 +1,225 @@
 <template>
-  <div class="crumb"><RouterLink to="/">首页</RouterLink> / 练习</div>
-  <h1 class="serif" style="margin-bottom: 6px">练习台 · 先思后看</h1>
-  <p class="muted" style="margin-bottom: 22px">
-    看案例先辨证处方，提交后逐条评分，再与原著对照。
-  </p>
-
-  <div v-if="loading" class="card">
-    <p class="muted">正在加载练习内容…</p>
-  </div>
-
-  <div v-else-if="error" class="card">
-    <p class="muted" style="color: #a32d2d; margin-bottom: 12px">{{ error }}</p>
-    <button class="btn ghost sm" @click="load">重试</button>
-  </div>
-
-  <template v-else>
-    <!-- 三种练法 -->
-    <div class="grid cols-3" style="margin-bottom: 26px">
-      <div class="card link" style="cursor: pointer" @click="start">
-        <div style="font-size: 26px">📖</div>
-        <h3 style="margin: 8px 0 4px">按方证单元练习</h3>
-        <p class="muted">选经典与方证类，按单元出题，先思后看。</p>
+  <div class="quiz">
+    <div class="quiz-head">
+      <div>
+        <h1>方证练习</h1>
+        <p class="muted">看证候，选方剂。共 {{ questions.length }} 题，选完立即出结果。</p>
       </div>
-      <RouterLink class="card link" to="/train/blindbox">
-        <div style="font-size: 26px">🎲</div>
-        <h3 style="margin: 8px 0 4px">案例盲盒</h3>
-        <p class="muted">随机抽一个医案，先答再看。</p>
-      </RouterLink>
-      <RouterLink class="card link" to="/train/recite">
-        <div style="font-size: 26px">📝</div>
-        <h3 style="margin: 8px 0 4px">背诵打卡</h3>
-        <p class="muted">条文默写 + 间隔重复（SRS）。</p>
-      </RouterLink>
+      <div class="progress-pill">{{ answeredCount }} / {{ questions.length }}</div>
     </div>
 
-    <div class="grid cols-2">
-      <!-- 选择练习内容 -->
-      <section class="card">
-        <h3 style="margin-bottom: 12px">选择练习内容</h3>
+    <div v-if="loading" class="card">
+      <p class="muted">正在准备题目…</p>
+    </div>
 
-        <div class="pick">
-          <div class="muted">经典</div>
-          <div class="chips">
-            <span
-              v-for="b in books"
-              :key="b.id"
-              class="chip clickable"
-              :class="{ sel: b.id === bookId }"
-              @click="selectBook(b.id)"
-            >
-              {{ b.title }}
-            </span>
-          </div>
-        </div>
+    <div v-else-if="!questions.length" class="card">
+      <p class="muted">题库暂时为空，请确认后端已启动并导入数据。</p>
+      <button class="btn primary sm" style="margin-top:12px" @click="load">重试</button>
+    </div>
 
-        <div class="pick">
-          <div class="muted">方证类</div>
-          <div class="chips">
-            <span
-              v-for="n in nodes"
-              :key="n.id"
-              class="chip clickable"
-              :class="{ sel: n.id === nodeId }"
-              @click="nodeId = n.id"
-            >
-              {{ n.title }}
-              <em v-if="n.practiced" class="tick">已练</em>
-            </span>
-          </div>
-          <p v-if="!nodes.length" class="muted" style="font-size: 13px; margin-top: 6px">
-            该经典下还没有可练的方证单元。
-          </p>
-        </div>
-
-        <div class="pick">
-          <div class="muted">模式</div>
-          <div class="chips">
-            <span
-              v-for="m in modes"
-              :key="m"
-              class="chip clickable"
-              :class="{ sel: m === mode }"
-              @click="mode = m"
-            >
-              {{ m }}
-            </span>
-          </div>
-        </div>
-
+    <template v-else>
+      <div class="question-nav">
         <button
-          class="btn primary"
-          style="margin-top: 16px"
-          :disabled="!nodeId || starting"
-          @click="start"
-        >
-          {{ starting ? '正在出题…' : `开始练习（${currentNode?.formulaCount ?? 0} 题）` }}
-        </button>
-        <p v-if="startError" class="muted" style="color: #a32d2d; margin-top: 10px">
-          {{ startError }}
-        </p>
-      </section>
+          v-for="(q, i) in questions"
+          :key="q.id"
+          class="qdot"
+          :class="{ cur: i === current, done: answers[q.id] !== undefined, right: answers[q.id] === q.answer }"
+          :title="`第 ${i + 1} 题`"
+          @click="current = i"
+        >{{ i + 1 }}</button>
+      </div>
 
-      <!-- 最近练习 -->
-      <section class="card">
-        <h3 style="margin-bottom: 12px">最近练习</h3>
-
-        <div v-if="recent.length" class="stagger" style="display: grid; gap: 10px">
-          <div v-for="r in recent" :key="r.sessionId" class="rowitem">
-            <span class="thumb">{{ r.score ?? '—' }}</span>
-            <div style="flex: 1">
-              <b>{{ r.nodeTitle }}</b>
-              <div class="muted">
-                {{ r.time }} · {{ r.mode }}
-                <template v-if="r.score !== null"> · 得分 {{ r.score }}</template>
-                <template v-if="r.durationSeconds > 0"> · 用时 {{ dur(r.durationSeconds) }}</template>
-                <template v-if="r.inWrongBook"> · 已加入错题本</template>
-              </div>
-            </div>
-          </div>
+      <section class="card qcard">
+        <div class="qmeta">
+          <span class="qno">第 {{ current + 1 }} 题</span>
+          <span class="chip">{{ questions[current].bookTitle || '中医方证' }}</span>
         </div>
 
-        <div v-else class="muted" style="font-size: 13.5px">
-          还没有练习记录。选一个单元，做第一道题。
+        <p class="qlabel">下列证候，最宜选用哪首方剂？</p>
+        <p class="qstem">{{ questions[current].syndrome }}</p>
+
+        <div class="options">
+          <button
+            v-for="(opt, i) in questions[current].options"
+            :key="opt"
+            class="option"
+            :class="optionClass(opt, questions[current])"
+            :disabled="answers[questions[current].id] !== undefined"
+            @click="choose(questions[current], opt)"
+          >
+            <span class="optkey">{{ 'ABCD'[i] }}</span>
+            <span class="opttext">{{ opt }}</span>
+            <span v-if="isRevealed(questions[current]) && opt === questions[current].answer" class="mark">✓</span>
+            <span v-else-if="isRevealed(questions[current]) && opt === answers[questions[current].id]" class="mark wrong">✕</span>
+          </button>
         </div>
 
-        <RouterLink class="btn ghost sm" style="margin-top: 12px" to="/me/profile">
-          查看学习档案 →
-        </RouterLink>
+        <div v-if="isRevealed(questions[current])" class="explain">
+          <b>正确答案：{{ questions[current].answer }}</b>
+          <span v-if="answers[questions[current].id] === questions[current].answer" class="ok">回答正确</span>
+          <span v-else class="no">你选了：{{ answers[questions[current].id] }}</span>
+        </div>
       </section>
-    </div>
-  </template>
+
+      <div class="qactions">
+        <button class="btn ghost" :disabled="current === 0" @click="current--">上一题</button>
+        <button class="btn ghost" :disabled="current >= questions.length - 1" @click="current++">下一题</button>
+        <button class="btn primary" @click="reset">重新练习</button>
+      </div>
+
+      <div v-if="answeredCount === questions.length" class="card result">
+        <h3>练习完成</h3>
+        <p>答对 <b>{{ correctCount }}</b> / {{ questions.length }} 题，正确率 {{ Math.round(correctCount / questions.length * 100) }}%</p>
+      </div>
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { getTrainOptions, startSession, type TrainOptions } from '@/api/train'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { search } from '@/api/search'
 
-const router = useRouter()
+interface Question {
+  id: string
+  syndrome: string
+  answer: string
+  options: string[]
+  bookTitle?: string
+}
 
-const data = ref<TrainOptions | null>(null)
+const questions = ref<Question[]>([])
 const loading = ref(true)
-const error = ref('')
+const current = ref(0)
+const answers = reactive<Record<string, string>>({})
 
-const bookId = ref('')
-const nodeId = ref('')
-const mode = ref('先思后看')
+const answeredCount = computed(() => Object.keys(answers).length)
+const correctCount = computed(() => questions.value.filter(q => answers[q.id] === q.answer).length)
 
-const starting = ref(false)
-const startError = ref('')
-
-const books = computed(() => data.value?.books ?? [])
-const modes = computed(() => data.value?.modes ?? ['先思后看'])
-const recent = computed(() => data.value?.recent ?? [])
-
-/** 当前选中经典下的可练单元 */
-const nodes = computed(() => books.value.find((b) => b.id === bookId.value)?.nodes ?? [])
-const currentNode = computed(() => nodes.value.find((n) => n.id === nodeId.value))
-
-function selectBook(id: string) {
-  bookId.value = id
-  nodeId.value = books.value.find((b) => b.id === id)?.nodes[0]?.id ?? ''
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
 }
 
-function dur(seconds: number) {
-  if (!seconds) return '0″'
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return m > 0 ? `${m}′${String(s).padStart(2, '0')}″` : `${s}″`
+function cleanText(s: string): string {
+  return s.replace(/\s+/g, ' ').replace(/[【】\[\]《》]/g, '').trim()
 }
 
+/** 题库来自真实方剂数据：搜常见关键字取方剂，用 meta.syndrome 作题干、方名作答案 */
 async function load() {
   loading.value = true
-  error.value = ''
   try {
-    const res = await getTrainOptions()
-    data.value = res
-    mode.value = res.modes?.[0] ?? '先思后看'
-    if (res.books?.length) {
-      selectBook(res.books[0].id)
+    const keywords = ['麻黄', '桂枝', '伤寒', '温病', '汤', '证治']
+    const results = await Promise.all(
+      keywords.map(k => search(k, { size: 40 }).catch(() => ({ list: [] })))
+    )
+    const pool = new Map<string, { name: string; syndrome: string; bookTitle?: string }>()
+    for (const res of results) {
+      for (const h of res.list || []) {
+        if (h.refType !== 'formula' || !h.title) continue
+        const syn = cleanText(String(h.meta?.syndrome || ''))
+        if (syn.length < 8 || syn.length > 140) continue
+        if (!pool.has(h.title)) {
+          pool.set(h.title, { name: h.title, syndrome: syn, bookTitle: h.bookTitle })
+        }
+      }
     }
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : '加载失败，请稍后重试'
+    const all = [...pool.values()]
+    const names = all.map(x => x.name)
+    const picked = shuffle(all).slice(0, 10)
+    questions.value = picked.map((item, idx) => {
+      const distractors = shuffle(names.filter(n => n !== item.name)).slice(0, 3)
+      return {
+        id: `q_${idx}`,
+        syndrome: item.syndrome,
+        answer: item.name,
+        options: shuffle([item.name, ...distractors]),
+        bookTitle: item.bookTitle
+      }
+    })
   } finally {
     loading.value = false
   }
 }
 
-async function start() {
-  if (!nodeId.value || starting.value) return
-  starting.value = true
-  startError.value = ''
-  try {
-    const q = await startSession(nodeId.value, mode.value)
-    // 题面交给答题页；刷新后仍可读（sessionStorage），避免重复开会话
-    sessionStorage.setItem('hm_question', JSON.stringify(q))
-    router.push(`/train/session/${q.sessionId}`)
-  } catch (e) {
-    startError.value = e instanceof Error ? e.message : '出题失败，请换个单元试试'
-  } finally {
-    starting.value = false
-  }
+function isRevealed(q: Question) {
+  return answers[q.id] !== undefined
+}
+
+function optionClass(opt: string, q: Question) {
+  const chosen = answers[q.id]
+  if (chosen === undefined) return ''
+  if (opt === q.answer) return 'correct'
+  if (opt === chosen) return 'wrong'
+  return ''
+}
+
+function choose(q: Question, opt: string) {
+  if (answers[q.id] !== undefined) return
+  answers[q.id] = opt
+}
+
+function reset() {
+  for (const k of Object.keys(answers)) delete answers[k]
+  current.value = 0
+  questions.value = shuffle(questions.value).map(q => ({
+    ...q,
+    options: shuffle(q.options)
+  }))
 }
 
 onMounted(load)
 </script>
 
 <style scoped>
-.pick {
-  margin-bottom: 14px;
-}
+.quiz { max-width: 860px; margin: 0 auto; }
+.quiz-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+.quiz-head h1 { margin: 0 0 4px; font-size: 26px; color: var(--primary-deep); }
+.quiz-head p { margin: 0; }
+.progress-pill { padding: 8px 18px; border-radius: 999px; font-weight: 700; color: var(--primary-deep);
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.9); }
 
-.pick .muted {
-  margin-bottom: 6px;
-}
+.question-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.qdot { width: 36px; height: 36px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+  background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.8); color: var(--text-2); transition: .15s; }
+.qdot.done { background: rgba(10,132,255,.16); color: var(--primary-deep); }
+.qdot.right { background: var(--primary); color: #fff; border-color: var(--primary); }
+.qdot.cur { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-.chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.qcard { padding: 28px; }
+.qmeta { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.qno { font-weight: 700; color: var(--primary-deep); }
+.qlabel { font-size: 13px; color: var(--text-2); margin-bottom: 8px; }
+.qstem { font-size: 18px; font-weight: 600; line-height: 1.7; margin-bottom: 24px; color: var(--text); }
 
-.chip.clickable {
-  cursor: pointer;
-}
+.options { display: grid; gap: 12px; }
+.option { display: flex; align-items: center; gap: 14px; text-align: left; padding: 14px 16px; border-radius: 14px;
+  background: rgba(255,255,255,.62); border: 1px solid rgba(255,255,255,.85); font-size: 15px; color: var(--text);
+  cursor: pointer; transition: .16s var(--ease); }
+.option:hover:not(:disabled) { transform: translateX(4px); border-color: var(--primary); background: rgba(255,255,255,.85); }
+.option:disabled { cursor: default; }
+.optkey { flex: none; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+  font-weight: 800; background: rgba(10,132,255,.12); color: var(--primary-deep); }
+.opttext { flex: 1; }
+.mark { font-weight: 800; color: #1E8E3E; }
+.mark.wrong { color: var(--error); }
+.option.correct { background: rgba(52,199,89,.16); border-color: rgba(52,199,89,.55); }
+.option.correct .optkey { background: #34C759; color: #fff; }
+.option.wrong { background: rgba(255,69,58,.13); border-color: rgba(255,69,58,.5); }
+.option.wrong .optkey { background: var(--error); color: #fff; }
 
-.chip .tick {
-  font-style: normal;
-  font-size: 10px;
-  margin-left: 4px;
-  padding: 0 4px;
-  border-radius: 4px;
-  background: var(--primary-soft);
-  color: var(--primary-deep);
-}
+.explain { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 20px; padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,.8); font-size: 14px; }
+.explain b { color: var(--primary-deep); }
+.ok { color: #1E8E3E; font-weight: 700; }
+.no { color: var(--error); font-weight: 700; }
 
-@media (max-width: 900px) {
-  .grid.cols-2,
-  .grid.cols-3 {
-    grid-template-columns: 1fr;
-  }
-}
+.qactions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.result { margin-top: 20px; text-align: center; }
+.result h3 { color: var(--primary-deep); margin-bottom: 6px; }
+
+@media(max-width: 620px){ .qcard { padding: 18px; } .qstem { font-size: 16px; } }
 </style>
