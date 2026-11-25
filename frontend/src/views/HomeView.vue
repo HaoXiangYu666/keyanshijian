@@ -1,5 +1,13 @@
 <template>
   <div class="portal">
+    <!-- 右上角个人入口 -->
+    <div class="top-nav">
+      <RouterLink to="/me" class="me-link">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+        我的
+      </RouterLink>
+    </div>
+
     <!-- 读书横幅：搜索是最高频动作，放在最显眼处 -->
     <section class="banner">
       <div class="banner-copy">
@@ -75,7 +83,7 @@ function goSearch() {
 
 /**
  * 五个核心入口：全部有真实数据支撑、面向学习者。
- * 已砍掉：科研、条文索引、书架、我的等低频或空壳入口。
+ * 已砍掉：科研、条文索引、书架等低频或空壳入口。「我的」放在右上角独立入口。
  */
 const modules: Array<{
   name: string; to: string; color: string; paths: string[]; step: string; desc: string
@@ -100,6 +108,12 @@ const modules: Array<{
 
 <style scoped>
 .portal { max-width:1320px;margin:0 auto;padding:clamp(20px,3vw,36px) clamp(16px,4vw,44px) 64px; }
+
+/* 右上角「我的」入口 */
+.top-nav{display:flex;justify-content:flex-end;margin-bottom:14px}
+.me-link{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;background:rgba(255,255,255,.82);border:1px solid rgba(10,111,232,.18);color:var(--primary,#0A6FE8);font-size:14px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px rgba(10,111,232,.08);transition:transform .15s,box-shadow .15s}
+.me-link:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(10,111,232,.16)}
+.me-link svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 /* 读书横幅 */
 .banner{
