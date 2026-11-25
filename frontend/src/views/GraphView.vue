@@ -8,7 +8,6 @@
         以「{{ data?.center.name ?? entity }}」为中心的 1 跳邻居 · 节点 {{ shownNodes.length }} 个 / 关系 {{ shownEdges.length }} 条
       </p>
     </div>
-    <RouterLink class="chip clickable" to="/graph/map">方证相似度地图 →</RouterLink>
   </div>
 
   <!-- 查询：后端 /api/biz/graph/neighbors 支持方名、方剂 ID(f_1)、药名、药味 ID(h_麻黄) -->

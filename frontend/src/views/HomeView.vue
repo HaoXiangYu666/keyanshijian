@@ -1,16 +1,16 @@
 <template>
   <div class="portal">
-    <!-- 读书横幅（图2 样式）：正是读书好时节 + 插画 + 搜索框 -->
+    <!-- 读书横幅：搜索是最高频动作，放在最显眼处 -->
     <section class="banner">
       <div class="banner-copy">
         <div class="banner-kicker">HERBMIND · 本草心智</div>
         <h1>正是读书<span>好时节</span></h1>
-        <p>中医药知识，一搜即得</p>
+        <p>搜方剂、查条文、读典籍，一搜即得</p>
         <form class="banner-search" @submit.prevent="goSearch">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg>
           <input
             v-model="keyword"
-            placeholder="搜方剂、医案、条文，如：桂枝汤"
+            placeholder="试试：桂枝汤、无汗而喘、白虎汤"
             aria-label="搜索"
           />
           <button type="submit">搜索</button>
@@ -27,33 +27,35 @@
           <path d="M250 92c-3-21 13-36 32-36 18 0 33 13 33 32-9-7-18-9-28-7-13 2-24 0-37-11Z" fill="#4A3428"/>
           <circle cx="316" cy="62" r="11" fill="#4A3428"/>
           <path d="M248 128c9-11 22-15 38-15s29 4 38 15l13 66h-102l13-66Z" fill="#FF5E57"/>
-          <path d="M254 138c-17 9-30 24-36 41l17 8c8-15 18-25 30-30M304 138c17 9 30 24 36 41l-17 8c-8-15-18-25-30-30" fill="#F6CBA9"/>
+          <path d="M254 138c-17 9-30 24-36 41l17 8c8-15 18-25 30-30M304 138c17 9 30 24 36 41l-17 8c8-15 18-25 30-30" fill="#F6CBA9"/>
           <path d="M214 178c15-13 32-19 51-19v27c-17 0-34 6-51 15v-23ZM336 159c19 0 36 6 51 19v23c-17-9-34-15-51-15v-27Z" fill="#FBE0CC"/>
           <path d="M38 62c19-23 47-30 71-19-19 23-47 30-71 19Z" fill="rgba(255,255,255,.28)"/>
-          <path d="M362 32c19-15 42-15 59 0-19 15-42 15-59 0Z" fill="rgba(255,255,255,.22)"/>
+          <path d="M362 32c19-15 42-15 59 0-19 15-42 15 59 0Z" fill="rgba(255,255,255,.22)"/>
         </svg>
       </div>
     </section>
 
-    <!-- 功能模块：与横幅同宽、卡片更大更醒目 -->
+    <!-- 学习主线：五个真正可用的功能，每张卡说明它能做什么 -->
     <div class="section-title">
       <span class="bar"></span>
-      <h2>功能导航</h2>
-      <p>选择一个模块开始</p>
+      <h2>开始学习</h2>
+      <p>找方证 → 读典籍 → 看关系 → 练题目 → 问疑惑</p>
     </div>
-    <section class="portal-grid" aria-label="功能模块">
+    <section class="portal-grid" aria-label="核心功能">
       <RouterLink
         v-for="m in modules"
         :key="m.name"
         class="portal-card"
         :to="m.to"
       >
+        <span class="card-step">{{ m.step }}</span>
         <span class="portal-icon" :style="{ background: m.color }">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path v-for="(d, i) in m.paths" :key="i" :d="d" />
           </svg>
         </span>
         <b>{{ m.name }}</b>
+        <span class="card-desc">{{ m.desc }}</span>
       </RouterLink>
     </section>
   </div>
@@ -71,24 +73,28 @@ function goSearch() {
   router.push({ path: '/search', query: q ? { q } : {} })
 }
 
-/** 首页 = 纯功能入口：不请求后端，服务未启动也能秒开 */
-const modules: Array<{ name: string; to: string; color: string; paths: string[] }> = [
-  { name: '典籍', to: '/library', color: 'linear-gradient(135deg,#4FA8FF,#0A6FE8)',
-    paths: ['M12 6c-2-1.5-5-2-9-1v13c4-1 7-.5 9 1 2-1.5 5-2 9-1V5c-4-1-7-.5-9 1Z', 'M12 6v13'] },
-  { name: '检索', to: '/search', color: 'linear-gradient(135deg,#2E9BF0,#0058C9)',
-    paths: ['M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Z', 'M16 16l5 5'] },
-  { name: '问答', to: '/ask', color: 'linear-gradient(135deg,#7D7AFF,#5E5CE6)',
-    paths: ['M4 5h16v11H9l-5 4V5Z', 'M8 9h8', 'M8 12h5'] },
-  { name: '图谱', to: '/graph', color: 'linear-gradient(135deg,#34C759,#1E8E3E)',
-    paths: ['M12 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z', 'M5 16a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z', 'M19 16a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z', 'm10.3 7.5-4 6.8', 'm13.7 7.5 4 6.8'] },
-  { name: '练习', to: '/train', color: 'linear-gradient(135deg,#FFB340,#FF7A00)',
-    paths: ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z', 'M12 7v5l3.5 2'] },
-  { name: '科研', to: '/research', color: 'linear-gradient(135deg,#FF7B7B,#E03A32)',
-    paths: ['M3 20h18', 'M6 20V10', 'M12 20V4', 'M18 20v-7'] },
-  { name: '条文', to: '/search/quote-index', color: 'linear-gradient(135deg,#5FD2FF,#0A84FF)',
-    paths: ['M6 3h9l4 4v14H6z', 'M15 3v5h4', 'M9 12h6', 'M9 16h6'] },
-  { name: '我的', to: '/me', color: 'linear-gradient(135deg,#FF9ECC,#D81E80)',
-    paths: ['M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z', 'M4 21a8 8 0 0 1 16 0'] }
+/**
+ * 五个核心入口：全部有真实数据支撑、面向学习者。
+ * 已砍掉：科研、条文索引、书架、我的等低频或空壳入口。
+ */
+const modules: Array<{
+  name: string; to: string; color: string; paths: string[]; step: string; desc: string
+}> = [
+  { name: '检索', to: '/search', step: '01 找', color: 'linear-gradient(135deg,#2E9BF0,#0058C9)',
+    paths: ['M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Z', 'M16 16l5 5'],
+    desc: '按方名、症状、原文快速找方剂与医案' },
+  { name: '典籍', to: '/library', step: '02 读', color: 'linear-gradient(135deg,#4FA8FF,#0A6FE8)',
+    paths: ['M12 6c-2-1.5-5-2-9-1v13c4-1 7-.5 9 1 2-1.5 5-2 9-1V5c-4-1-7-.5-9 1Z', 'M12 6v13'],
+    desc: '按章节阅读伤寒论、金匮要略原文' },
+  { name: '图谱', to: '/graph', step: '03 看', color: 'linear-gradient(135deg,#34C759,#1E8E3E)',
+    paths: ['M12 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z', 'M5 16a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z', 'M19 16a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z', 'm10.3 7.5-4 6.8', 'm13.7 7.5 4 6.8'],
+    desc: '可视化方剂与药味的关联关系' },
+  { name: '练习', to: '/train', step: '04 练', color: 'linear-gradient(135deg,#FFB340,#FF7A00)',
+    paths: ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z', 'M12 7v5l3.5 2'],
+    desc: '按章节做题，附解析与错题汇总' },
+  { name: '问答', to: '/ask', step: '05 问', color: 'linear-gradient(135deg,#7D7AFF,#5E5CE6)',
+    paths: ['M4 5h16v11H9l-5 4V5Z', 'M8 9h8', 'M8 12h5'],
+    desc: '用自然语言提问，答案附典籍出处' }
 ]
 </script>
 
@@ -124,39 +130,39 @@ const modules: Array<{ name: string; to: string; color: string; paths: string[] 
 .banner-art svg{width:100%;height:auto;display:block}
 
 /* 分区标题 */
-.section-title{display:flex;align-items:center;gap:12px;margin:clamp(28px,3.6vw,42px) 4px 20px}
+.section-title{display:flex;align-items:center;gap:12px;margin:clamp(28px,3.6vw,42px) 4px 20px;flex-wrap:wrap}
 .section-title .bar{width:5px;height:24px;border-radius:3px;background:linear-gradient(180deg,#3AA0FF,#0A6FE8)}
 .section-title h2{margin:0;font-size:22px;color:var(--primary-deep);letter-spacing:1px}
 .section-title p{margin:0;color:var(--text-3);font-size:14px}
 
-/* 功能模块：铺满、与横幅同宽 */
-.portal-grid{
-  margin:0;
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:clamp(18px,2.2vw,30px);
-}
+/* 五个核心功能卡 */
+.portal-grid{margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(14px,1.6vw,22px)}
 .portal-card{
-  min-height:238px;padding:34px 20px;border-radius:26px;
+  position:relative;min-height:262px;padding:28px 16px 24px;border-radius:24px;
   background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);
   -webkit-backdrop-filter:saturate(170%) blur(24px);backdrop-filter:saturate(170%) blur(24px);
   box-shadow:0 16px 40px rgba(10,110,220,.16),inset 0 1px 0 rgba(255,255,255,.95);
-  text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
   transition:transform .22s var(--ease),box-shadow .22s var(--ease),background .22s var(--ease);
 }
-.portal-card:hover{transform:translateY(-10px);background:rgba(255,255,255,.9);
+.portal-card:hover{transform:translateY(-10px);background:rgba(255,255,255,.92);
   box-shadow:0 28px 56px rgba(10,110,220,.26),inset 0 1px 0 rgba(255,255,255,1)}
-.portal-icon{width:92px;height:92px;border-radius:26px;display:grid;place-items:center;
+.card-step{position:absolute;top:16px;left:18px;font-size:12px;font-weight:700;color:var(--primary);opacity:.72;letter-spacing:1px}
+.portal-icon{width:80px;height:80px;border-radius:24px;display:grid;place-items:center;margin-top:14px;
   box-shadow:0 14px 30px rgba(10,110,220,.3),inset 0 1px 0 rgba(255,255,255,.5)}
-.portal-icon svg{width:48px;height:48px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.portal-card b{font-size:23px;letter-spacing:5px;color:var(--primary-deep)}
+.portal-icon svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.portal-card b{font-size:22px;letter-spacing:4px;color:var(--primary-deep)}
+.card-desc{font-size:13px;line-height:1.6;color:var(--text-3);max-width:190px}
 
-@media(max-width:1000px){.portal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.banner-art{width:300px;opacity:.92}}
+@media(max-width:1100px){.portal-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.banner-art{width:300px;opacity:.92}}
+@media(max-width:720px){.portal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){
   .banner{padding:28px 22px}.banner-art{display:none}.banner-search{padding-left:14px}
   .banner-search button{padding:11px 22px}
-  .portal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-  .portal-card{min-height:160px;padding:20px 10px;gap:12px}
-  .portal-icon{width:66px;height:66px;border-radius:20px}.portal-icon svg{width:34px;height:34px}
+  .portal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .portal-card{min-height:180px;padding:20px 10px;gap:10px}
+  .portal-icon{width:62px;height:62px;border-radius:18px;margin-top:10px}.portal-icon svg{width:32px;height:32px}
   .portal-card b{font-size:18px;letter-spacing:3px}
+  .card-desc{font-size:12px;max-width:140px}
 }
 </style>

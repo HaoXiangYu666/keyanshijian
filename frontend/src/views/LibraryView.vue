@@ -14,7 +14,6 @@
         @click="switchBook(b)"
       >{{ b.label }}</button>
     </span>
-    <RouterLink class="chip clickable" to="/shelf">书架 ↗</RouterLink>
   </div>
 
   <p v-if="error" class="muted" style="color:#A32D2D">{{ error }}</p>
