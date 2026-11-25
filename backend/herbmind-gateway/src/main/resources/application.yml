@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: herbmind-gateway
+  cloud:
+    gateway:
+      routes:
+        # /api/biz/** 只给 BFF
+        - id: bff
+          uri: http://localhost:8090
+          predicates:
+            - Path=/api/biz/**
+        # /api/agent/** 只给 Agent（阶段 0 后接入）
+        - id: agent
+          uri: http://localhost:8091
+          predicates:
+            - Path=/api/agent/**
+
+logging:
+  level:
+    org.springframework.cloud.gateway: info
+
+herbmind:
+  jwt:
+    # 必须与 svc-identity 的 herbmind.jwt.secret 完全一致（同一把钥匙签发/校验）
+    secret: herbmind-dev-jwt-secret-please-change-before-prod-0123456789

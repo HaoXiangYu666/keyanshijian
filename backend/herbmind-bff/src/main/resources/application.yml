@@ -1,0 +1,31 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: herbmind-bff
+  jackson:
+    default-property-inclusion: non_null
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 2000
+            readTimeout: 10000
+
+# 本地开发：静态直连 svc（免 Nacos）。集成日改为服务名发现即可。
+herbmind:
+  # 域2（身份 / 成长）
+  svc-identity-url: http://localhost:8081
+  svc-training-url: http://localhost:8084
+  # 域1（内容）
+  svc-catalog-url: http://localhost:8082
+  svc-search-url: http://localhost:8083
+  svc-insight-url: http://localhost:8086
+  # 域3（智能）：图谱转发，见 09 契约 §15.6 步骤 2
+  svc-graph-url: http://localhost:8085
+
+logging:
+  level:
+    com.herbmind: debug

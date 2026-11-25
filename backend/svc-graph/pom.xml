@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.herbmind</groupId>
+    <artifactId>herbmind-backend</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>svc-graph</artifactId>
+  <name>HerbMind svc-graph</name>
+
+  <dependencies>
+    <!-- 只需要 R / GlobalExceptionHandler，不依赖 contract：图谱 DTO 目前只有 BFF 会用到，
+         放进 contract 属于横切资产（改动需三人 review），等真有第二个消费方再提升。 -->
+    <dependency>
+      <groupId>com.herbmind</groupId>
+      <artifactId>herbmind-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.neo4j.driver</groupId>
+      <artifactId>neo4j-java-driver</artifactId>
+      <version>5.26.0</version>
+    </dependency>
+    <!-- PG 只读源：药味顺序 seq 与 Jaccard 在服务端算（09 契约 §15.3/§15.5），BFF 不用聚合 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <!-- 父 POM 未固定 surefire 版本，Maven 默认的 2.12.4 不认 JUnit 5（会显示 Tests run: 0）。
+           只在本模块覆盖版本，不动父 POM（那是横切文件，改要三人 review）。 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>

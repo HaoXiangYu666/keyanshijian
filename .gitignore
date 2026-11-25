@@ -1,0 +1,55 @@
+# 依赖与构建产物
+target/
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 运行时
+docker/volumes/
+*.log
+.env
+
+# ★ 数据快照：体积大，一律不进仓库（由团队私下分发，见 docs/新人上手指南.md）
+herbmind_data.sql
+herbmind_data.sql.gz
+*.sql.gz
+*.dump
+database/seed/
+!database/pg/*.sql
+
+# 流程草稿区（executing-plans）
+.superpowers/
+
+# 补录脚本每次写入留下的回滚日志（临时产物，不进仓库）
+database/etl/data/_apply_log_*.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ★ 智能体全局记忆：只存本机，不进仓库（含协作口径与实核结论）
+# PROJECT_MEMORY.md 是索引；细节按主题拆在 memory/ 各分册
+PROJECT_MEMORY.md
+memory/
+
+# 单测报告是每次跑测试重新生成的产物（跑法见 CODEBUDDY.md §八），不进仓库
+agent/test_report.json
+agent/test_report.md
+
+.codebuddy
+
+# 本地工具产物：走查截图/页面快照、Vite 预构建缓存、起服务时的 stderr 重定向
+# （2026-11-11 曾被 git add . 误提交进 2b90fe3，已在 6c15621 移除）
+.playwright-cli/
+.vite/
+tmp-*.err
+
+.vite/
+.playwright-cli/

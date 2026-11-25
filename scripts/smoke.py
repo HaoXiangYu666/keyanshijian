@@ -1,0 +1,90 @@
+"""端到端冒烟：PG 计数 + 向量 + BFF 接口 + Neo4j 计数。
+
+前置：中间件已起、数据已导入（migrate_legacy.py）、svc-catalog / bff / gateway 已启动。
+运行：python smoke.py     （任一失败即非零退出）
+"""
+import json
+import os
+import sys
+
+import requests
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "database", "etl"))
+from db import neo4j_driver, query  # noqa: E402
+
+BFF = os.getenv("BFF_BASE", "http://localhost:8090")
+FAIL = False
+
+# 正式数据基线（来自 migrate_legacy + 2026-10-26 补录 + 2026-11-11 两轮补录）
+# formula_herb 从 1006 涨到 1315：2026-10-26 用 database/etl/apply_supplement.py 补了 309 条组成，
+# 补录输入见 database/etl/data/formula_herb_supplement.csv。改这条基线前先确认补录是否仍然生效。
+# content_unit 535 → 538：2026-11-11 用 database/etl/merge_book_and_import_chapter1.py 补回原先
+# 整章丢失的第一章（3 个 theory 单元，ref_type='node'）。
+# content_unit 538 → 598：2026-11-11 用 database/etl/import_docx_gap.py 补了 58 条节级概述
+# （section_abstract）+ 2 条方证比较表（table）。
+# 两轮补录的顺序：先 merge_book_and_import_chapter1（会重建 book_node），再 import_docx_gap
+# （后者按节点标题挂接，节点变了必须重跑）。
+EXPECT = {
+    "formula": 245,
+    "case_record": 290,
+    "classic_quote": 568,
+    "content_unit": 598,
+    "formula_herb": 1315,
+}
+
+
+def check(label, cond, detail=""):
+    global FAIL
+    print(("PASS " if cond else "FAIL ") + label + (f"  {detail}" if detail else ""))
+    if not cond:
+        FAIL = True
+
+
+def main():
+    # 1) PG 行数
+    try:
+        for table, want in EXPECT.items():
+            got = query(f"SELECT count(*) FROM {table}")[0][0]
+            check(f"PG: {table}={want}", got == want, f"got {got}")
+    except Exception as e:  # noqa: BLE001
+        check("PG reachable", False, str(e))
+
+    # 2) 向量（全部非空、1024 维）
+    try:
+        with_vec, total, dims = query(
+            "SELECT count(*) FILTER (WHERE embedding IS NOT NULL), count(*), "
+            "(SELECT vector_dims(embedding) FROM content_unit WHERE embedding IS NOT NULL LIMIT 1) "
+            "FROM content_unit"
+        )[0]
+        check("PG: 向量覆盖全部单元", with_vec == total, f"got {with_vec}/{total}")
+        check("PG: 向量 1024 维", dims == 1024, f"got {dims}")
+    except Exception as e:  # noqa: BLE001
+        check("PG 向量可查", False, str(e))
+
+    # 3) BFF（经网关或直连 BFF）
+    try:
+        r = requests.get(f"{BFF}/api/biz/library/tree", params={"bookId": "bk_1"}, timeout=5)
+        body = r.json()
+        check("BFF: code=0", body.get("code") == 0, f"body={json.dumps(body, ensure_ascii=False)[:100]}")
+        check("BFF: data is list", isinstance(body.get("data"), list))
+    except Exception as e:  # noqa: BLE001
+        check("BFF reachable", False, str(e))
+
+    # 4) Neo4j（方剂按 id 建，应为 245）
+    try:
+        d = neo4j_driver()
+        with d.session() as s:
+            c = s.run("MATCH (f:Formula) RETURN count(f) AS c").single()["c"]
+            rel = s.run("MATCH ()-[r:COMPOSED_OF]->() RETURN count(r) AS c").single()["c"]
+        d.close()
+        check("Neo4j: Formula=245", c == 245, f"got {c}")
+        check("Neo4j: COMPOSED_OF>900", rel > 900, f"got {rel}")
+    except Exception as e:  # noqa: BLE001
+        check("Neo4j reachable", False, str(e))
+
+    print("\nSMOKE " + ("FAILED" if FAIL else "OK"))
+    sys.exit(1 if FAIL else 0)
+
+
+if __name__ == "__main__":
+    main()
