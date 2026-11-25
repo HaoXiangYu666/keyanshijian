@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
 
 /**
  * 精简后的页面清单：只保留真实有数据、面向学习者的核心功能。
@@ -118,7 +118,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
-const router = createRouter({ history: createWebHistory(), routes })
+// hash 路由：构建产物双击 file:// 打开时也能正常跳转，不依赖服务端重写
+const router = createRouter({ history: createWebHashHistory(), routes })
 
 router.afterEach(() => {
   document.title = 'HerbMind 本草心智'
