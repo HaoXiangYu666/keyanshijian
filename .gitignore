@@ -57,6 +57,4 @@ tmp-*.err
 frontend/scripts/src/
 
 # 本地静态站点构建产物（双击 index.html 可直接查看）
-/index.html
-/favicon.svg
 /assets/
