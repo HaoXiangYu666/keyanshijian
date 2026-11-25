@@ -1,13 +1,5 @@
 <template>
   <div class="portal">
-    <!-- 右上角个人入口 -->
-    <div class="top-nav">
-      <RouterLink to="/me" class="me-link">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
-        我的
-      </RouterLink>
-    </div>
-
     <!-- 读书横幅：搜索是最高频动作，放在最显眼处 -->
     <section class="banner">
       <div class="banner-copy">
@@ -43,11 +35,11 @@
       </div>
     </section>
 
-    <!-- 学习主线：五个真正可用的功能，每张卡说明它能做什么 -->
+    <!-- 六个模块：上三下三，卡片放大 -->
     <div class="section-title">
       <span class="bar"></span>
       <h2>开始学习</h2>
-      <p>找方证 → 读典籍 → 看关系 → 练题目 → 问疑惑</p>
+      <p>找方证 → 读典籍 → 看关系 → 练题目 → 问疑惑 → 我的</p>
     </div>
     <section class="portal-grid" aria-label="核心功能">
       <RouterLink
@@ -82,8 +74,7 @@ function goSearch() {
 }
 
 /**
- * 五个核心入口：全部有真实数据支撑、面向学习者。
- * 已砍掉：科研、条文索引、书架等低频或空壳入口。「我的」放在右上角独立入口。
+ * 六个模块：上三下三大卡片布局。检索/典籍/图谱/练习/问答/我的，全部有真实数据支撑。
  */
 const modules: Array<{
   name: string; to: string; color: string; paths: string[]; step: string; desc: string
@@ -102,18 +93,15 @@ const modules: Array<{
     desc: '按章节做题，附解析与错题汇总' },
   { name: '问答', to: '/ask', step: '05 问', color: 'linear-gradient(135deg,#7D7AFF,#5E5CE6)',
     paths: ['M4 5h16v11H9l-5 4V5Z', 'M8 9h8', 'M8 12h5'],
-    desc: '用自然语言提问，答案附典籍出处' }
+    desc: '用自然语言提问，答案附典籍出处' },
+  { name: '我的', to: '/me', step: '06 我', color: 'linear-gradient(135deg,#5AC8D8,#0E8FA8)',
+    paths: ['M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z', 'M4 21c0-4 3.6-7 8-7s8 3 8 7'],
+    desc: '登录状态、问答记录与个人设置' }
 ]
 </script>
 
 <style scoped>
 .portal { max-width:1320px;margin:0 auto;padding:clamp(20px,3vw,36px) clamp(16px,4vw,44px) 64px; }
-
-/* 右上角「我的」入口 */
-.top-nav{display:flex;justify-content:flex-end;margin-bottom:14px}
-.me-link{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;background:rgba(255,255,255,.82);border:1px solid rgba(10,111,232,.18);color:var(--primary,#0A6FE8);font-size:14px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px rgba(10,111,232,.08);transition:transform .15s,box-shadow .15s}
-.me-link:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(10,111,232,.16)}
-.me-link svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 /* 读书横幅 */
 .banner{
@@ -149,34 +137,35 @@ const modules: Array<{
 .section-title h2{margin:0;font-size:22px;color:var(--primary-deep);letter-spacing:1px}
 .section-title p{margin:0;color:var(--text-3);font-size:14px}
 
-/* 五个核心功能卡 */
-.portal-grid{margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(14px,1.6vw,22px)}
+/* 六个核心功能卡：上三下三，卡片放大 */
+.portal-grid{margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,2vw,28px)}
 .portal-card{
-  position:relative;min-height:262px;padding:28px 16px 24px;border-radius:24px;
+  position:relative;min-height:320px;padding:38px 24px 32px;border-radius:28px;
   background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);
   -webkit-backdrop-filter:saturate(170%) blur(24px);backdrop-filter:saturate(170%) blur(24px);
   box-shadow:0 16px 40px rgba(10,110,220,.16),inset 0 1px 0 rgba(255,255,255,.95);
-  text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
+  text-decoration:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;
   transition:transform .22s var(--ease),box-shadow .22s var(--ease),background .22s var(--ease);
 }
 .portal-card:hover{transform:translateY(-10px);background:rgba(255,255,255,.92);
   box-shadow:0 28px 56px rgba(10,110,220,.26),inset 0 1px 0 rgba(255,255,255,1)}
-.card-step{position:absolute;top:16px;left:18px;font-size:12px;font-weight:700;color:var(--primary);opacity:.72;letter-spacing:1px}
-.portal-icon{width:80px;height:80px;border-radius:24px;display:grid;place-items:center;margin-top:14px;
+.card-step{position:absolute;top:22px;left:26px;font-size:15px;font-weight:700;color:var(--primary);opacity:.72;letter-spacing:1px}
+.portal-icon{width:104px;height:104px;border-radius:30px;display:grid;place-items:center;margin-top:18px;
   box-shadow:0 14px 30px rgba(10,110,220,.3),inset 0 1px 0 rgba(255,255,255,.5)}
-.portal-icon svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.portal-card b{font-size:22px;letter-spacing:4px;color:var(--primary-deep)}
-.card-desc{font-size:13px;line-height:1.6;color:var(--text-3);max-width:190px}
+.portal-icon svg{width:54px;height:54px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.portal-card b{font-size:28px;letter-spacing:6px;color:var(--primary-deep)}
+.card-desc{font-size:15px;line-height:1.7;color:var(--text-3);max-width:260px}
 
-@media(max-width:1100px){.portal-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.banner-art{width:300px;opacity:.92}}
-@media(max-width:720px){.portal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.portal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.banner-art{width:300px;opacity:.92}}
+@media(max-width:560px){.portal-grid{grid-template-columns:repeat(1,minmax(0,1fr))}}
 @media(max-width:620px){
   .banner{padding:28px 22px}.banner-art{display:none}.banner-search{padding-left:14px}
   .banner-search button{padding:11px 22px}
-  .portal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .portal-card{min-height:180px;padding:20px 10px;gap:10px}
-  .portal-icon{width:62px;height:62px;border-radius:18px;margin-top:10px}.portal-icon svg{width:32px;height:32px}
-  .portal-card b{font-size:18px;letter-spacing:3px}
-  .card-desc{font-size:12px;max-width:140px}
+  .portal-grid{gap:14px}
+  .portal-card{min-height:230px;padding:26px 14px;gap:12px}
+  .portal-icon{width:76px;height:76px;border-radius:22px;margin-top:12px}.portal-icon svg{width:40px;height:40px}
+  .portal-card b{font-size:21px;letter-spacing:4px}
+  .card-step{font-size:13px;top:16px;left:18px}
+  .card-desc{font-size:13px;max-width:180px}
 }
 </style>
