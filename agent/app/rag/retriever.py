@@ -178,3 +178,105 @@ async def retrieve(
         units[0].score if units else 0.0,
     )
     return kept
+
+
+# ==================== 无 LLM key 时的关键词检索降级 ====================
+# bge-m3 embedding 与聊天模型共用同一个 LLM_API_KEY。本机未配置 key 时，
+# 向量检索整条链会抛 RuntimeError，问答完全不可用。这里提供一条纯 PG 关键词
+# 检索路径：中文 2-gram 拆词 + ILIKE 命中打分，不依赖任何外部模型，
+# 配合 ask.py 的降级分支，让"没 key 也能问、且回答基于真实资料"。
+
+# 提问里这些词对检索无意义，拆 gram 时忽略
+_STOP = set(
+    "了吗呢啊吧请问什么怎么哪些哪里可以是否的了我你他这那和与及在是有为将把被给对从到用什么方剂治疗"
+    "怎样如何这个那个是否通过一下现在根据因为所以但是具有用于属于一种比较更加还是或者以及的话".split()
+) | {"用什", "么方", "紧用", "而喘", "汗而", "紧用"}
+# 单字词不拆，_len>=2 的中文串拆成 2-gram
+_CJK = __import__("re").compile(r"[\u4e00-\u9fa5]{2,}")
+
+
+def _keyword_grams(question: str) -> list[str]:
+    """从问题里提取检索词：连续中文拆 2-gram，去掉停用词，保留方名类完整词。"""
+    grams: list[str] = []
+    for seg in _CJK.findall(question):
+        if seg in _STOP or len(seg) <= 1:
+            continue
+        if len(seg) <= 4:
+            grams.append(seg)
+        for i in range(len(seg) - 1):
+            g = seg[i:i + 2]
+            if g not in _STOP:
+                grams.append(g)
+    # 去重保序，限制数量避免 SQL 过长
+    seen: set[str] = set()
+    out = []
+    for g in grams:
+        if g not in seen:
+            seen.add(g)
+            out.append(g)
+    return out[:24]
+
+
+async def retrieve_keyword(
+    question: str,
+    top_k: int | None = None,
+    ref_type: str | None = None,
+) -> list[RetrievedUnit]:
+    """纯关键词检索（无 embedding、无 LLM key）。
+
+    对每个内容单元，统计命中了多少个问题词（标题命中权重更高），按命中数降序。
+    分数归一化到 0~1，便于复用下游 score 展示逻辑。
+    """
+    s = get_settings()
+    limit = top_k or s.retrieval_top_k
+    grams = _keyword_grams(question)
+    if not grams:
+        return []
+
+    # 检索字段：标题、正文、证候(syndrome)、主方(formula)。
+    # 症状类问题（"无汗而喘、脉浮紧"）的词主要落在 syndrome 元数据里，必须一起查。
+    # 用 unnest(数组) 一次传所有词，避免逐个拼占位符（也绕开 f-string 里 %s 的转义坑）。
+    patterns = [f"%{g}%" for g in grams]
+    match_sql = """
+        coalesce(cu.title,'') ILIKE p
+        OR cu.content ILIKE p
+        OR coalesce(cu.meta_jsonb->>'syndrome','') ILIKE p
+        OR coalesce(cu.meta_jsonb->>'formula','') ILIKE p
+    """
+    type_filter = "AND cu.ref_type = %s" if ref_type else ""
+    params: list = [patterns, patterns]
+    if ref_type:
+        params.append(ref_type)
+    params.append(limit)
+    sql = f"""
+        SELECT cu.id, cu.ref_type, cu.ref_id, coalesce(cu.title,'') AS title, cu.content,
+               (SELECT count(*) FROM unnest(%s::text[]) AS p WHERE {match_sql}) AS hits
+        FROM content_unit cu
+        WHERE EXISTS (SELECT 1 FROM unnest(%s::text[]) AS p WHERE {match_sql})
+          {type_filter}
+        ORDER BY hits DESC, length(cu.content) ASC
+        LIMIT %s
+    """
+
+    def _query() -> list[tuple]:
+        with get_pg_pool().connection(timeout=5) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, params)
+                return cur.fetchall()
+
+    rows = await asyncio.to_thread(_query)
+    max_hits = max((int(r[5]) for r in rows), default=1) or 1
+    units = [
+        RetrievedUnit(
+            id=r[0], ref_type=r[1], ref_id=r[2],
+            title=_display_title(r[1], r[3], r[4], r[2]),
+            content=r[4],
+            score=round(min(1.0, 0.45 + 0.55 * int(r[5]) / max_hits), 4),
+        )
+        for r in rows
+    ]
+    logger.info(
+        "关键词检索『%s』grams=%s → %d 条（最高命中 %d）",
+        question[:24], grams[:8], len(units), max_hits,
+    )
+    return units

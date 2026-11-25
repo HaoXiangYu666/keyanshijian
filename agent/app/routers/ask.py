@@ -32,7 +32,8 @@ from app.agent.runner import ToolTrace, run_tool_loop, stream_tool_loop
 from app.llm import chat_stream, chat_with_messages
 from app.rag import sse
 from app.rag.context import build_messages, degraded_answer, extract_citations
-from app.rag.retriever import retrieve
+from app.rag.retriever import retrieve, retrieve_keyword
+from app.config import get_settings
 from app.repo.conversation import (
     append_message,
     ensure_conversation,
@@ -53,6 +54,32 @@ NO_HIT_ANSWER = (
 )
 
 _CITE_TAG = re.compile(r"\[(\d{1,2})\]")
+
+
+def _offline_answer(question: str, units: list) -> str:
+    """无 LLM key 时的降级回答：不编造，直接整理检索到的真实资料。
+
+    明确告诉用户这是"资料摘录"而非模型生成，避免把摘录取误当成 AI 结论。
+    """
+    if not units:
+        return (
+            "当前为关键词检索模式（未配置 AI 模型密钥）。\n"
+            "没有在知识库里找到与「%s」直接相关的内容。\n"
+            "可以换个更具体的方名、症状或条文关键词再试，例如「麻黄汤」「桂枝汤」。"
+            % question[:40]
+        )
+    lines = [
+        "当前为关键词检索模式（未配置 AI 模型密钥，以下为知识库原文摘录，未经模型整理）：",
+        "",
+    ]
+    for idx, u in enumerate(units, 1):
+        kind = getattr(u, "kind_label", "资料")
+        title = getattr(u, "title", "") or getattr(u, "ref_id", "")
+        snippet = u.snippet(150) if hasattr(u, "snippet") else str(getattr(u, "content", ""))[:150]
+        lines.append(f"[{idx}] {kind}·{title}：{snippet}")
+    lines.append("")
+    lines.append("如需 AI 归纳总结，请配置 LLM_API_KEY 后重启问答服务。")
+    return "\n".join(lines)
 
 
 def clamp_citation_tags(text: str, max_index: int) -> tuple[str, list[int]]:
@@ -149,14 +176,21 @@ async def ask_sync(
     history = await recent_messages(req.conversation_id) if req.conversation_id else []
 
     # ---------- ① 检索 ----------
+    # 无 LLM_API_KEY 时 embedding 与 chat 都不可用：走纯关键词检索降级，
+    # 用真实资料拼回答，保证"没 key 也能问"，而不是直接抛"检索服务异常"。
+    s = get_settings()
+    offline = not s.llm_configured
     t0 = time.perf_counter()
     try:
-        units = await retrieve(question, top_k=req.top_k, ref_type=req.ref_type)
+        units = await (retrieve_keyword(question, top_k=req.top_k, ref_type=req.ref_type)
+                       if offline else retrieve(question, top_k=req.top_k, ref_type=req.ref_type))
     except Exception as exc:  # noqa: BLE001 —— 检索失败也要给前端可显示的答复
         logger.exception("检索失败")
+        fallback = _offline_answer(question, []) if offline else f"检索服务异常（{type(exc).__name__}），请稍后重试。"
+        background.add_task(_persist_ask, conversation_id, x_user_id, question, fallback, [])
         return R.ok(
             AskData(
-                answer=f"检索服务异常（{type(exc).__name__}），请稍后重试。",
+                answer=fallback,
                 citations=[],
                 usage=AskUsage(retrieve_ms=int((time.perf_counter() - t0) * 1000)),
                 degraded=True,
@@ -164,6 +198,21 @@ async def ask_sync(
             )
         )
     retrieve_ms = int((time.perf_counter() - t0) * 1000)
+
+    # 离线降级：跳过工具取证与大模型，直接把检索到的真实资料整理成可显示回答
+    if offline:
+        citations = extract_citations(units)
+        answer = _offline_answer(question, units)
+        background.add_task(_persist_ask, conversation_id, x_user_id, question, answer, [])
+        return R.ok(
+            AskData(
+                answer=answer,
+                citations=citations,
+                usage=AskUsage(retrieve_ms=retrieve_ms),
+                degraded=True,
+                conversation_id=conversation_id,
+            )
+        )
 
     if not units:
         logger.info("问答无命中：fp=%s", hashlib.sha1(question.encode("utf-8")).hexdigest()[:8])
