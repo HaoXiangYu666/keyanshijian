@@ -15,6 +15,8 @@ const repoDir = path.resolve(frontendDir, '..')
  */
 const standalonePlugin = {
   name: 'standalone-file-site',
+  // 只在 build 时生效：dev 模式若注入构建产物 app.js，会导致整页重复挂载、路由被重置回首页
+  apply: 'build' as const,
   transformIndexHtml(html: string) {
     return html
       .replace(/ crossorigin/g, '')

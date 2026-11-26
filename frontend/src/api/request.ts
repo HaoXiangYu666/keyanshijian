@@ -35,7 +35,8 @@ request.interceptors.response.use(
     // 还丢掉当前页面上下文 —— 交给调用方把 msg 显示出来。
     if (status === 401) {
       localStorage.removeItem('token')
-      if (location.pathname !== '/login') location.href = '/login'
+      // hash 路由下必须改 hash；直接用 location.href='/login' 会整页重载并落回首页
+      if (!location.hash.startsWith('#/login')) location.hash = '#/login'
     }
     // 状态码挂到 Error 上：只留 message 的话，调用方分不出 4000（参数错）/4040（实体不存在）
     // /5000（服务异常），`api/graph.ts` 的 `httpStatus` 就是靠这个字段做分支的。
