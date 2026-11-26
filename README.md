@@ -1,14 +1,16 @@
-# HerbMind（本草心智）· v2 重构
+# 本草心智（HerbMind）· 中医典籍学习平台
 
-> 可插拔的多语料中医知识平台。首个语料《中医经典方证案例研究》，已接入《伤寒论》原文。
-> 规划文档（含 `prototype/` 原型）见本仓库 [`project_plan/`](project_plan/)。
-> **远端仓库**：`https://github.com/Manchenlin/HerbMind2.0.git`
+> 面向中医经典学习的知识平台。首个语料《中医经典方证案例研究》，已接入《伤寒论》《金匮要略》《温病学》原文，
+> 覆盖 245 首方剂、290 例医案、568 条原文、535 个内容单元（均含 1024 维向量）。
+>
+> **仓库地址**：`https://github.com/HaoXiangYu666/keyanshijian.git`
+> 规划与问题记录见 [`project_plan02/`](project_plan02/)。
 
 ## 获取代码
 
 ```bash
-git clone https://github.com/Manchenlin/HerbMind2.0.git
-cd HerbMind2.0
+git clone https://github.com/HaoXiangYu666/keyanshijian.git
+cd keyanshijian
 ```
 
 ## 快速开始
@@ -35,7 +37,7 @@ bash scripts/init-data.sh /c/Users/你/Desktop/herbmind_data.sql
 #    前端：cd frontend && npm i && npm run dev  →  http://localhost:5173/
 ```
 
-> **数据不重复消耗**：598 条向量已随快照分发，**任何人都不需要重新调用 Embedding API**。
+> **数据不重复消耗**：535 条向量已随快照分发，**任何人都不需要重新调用 Embedding API**。
 
 ## 数据库（已建成 · 41 表 / 73 索引）
 
@@ -49,13 +51,13 @@ bash scripts/init-data.sh /c/Users/你/Desktop/herbmind_data.sql
 | `03-domains.sql` | 用户域 / 练习学习域 / 图谱规则域 / Agent 域 / 治理域 + 专属关系表 |
 | `04-indexes.sql` | **HNSW 向量索引** + GIN 全文 + trgm 模糊索引 |
 
-数据（2026-11-11 实核，见 `scripts/smoke.py` 基线）：`formula=245`、`case_record=290`、`classic_quote=568`、`content_unit=598`（全含 1024 维向量）、`formula_herb=1315`、`relation=155`。
+数据（2026-11-26 实核，见 `scripts/smoke.py` 基线）：`formula=245`、`case_record=290`、`classic_quote=568`、`content_unit=535`（全含 1024 维向量）、`formula_herb=1006`、`relation=155`、`book_node=69`。
 Neo4j：`Formula=245`、`Herb=376`、`COMPOSED_OF=1288`。
 
 ## 目录结构
 
 ```
-HerbMind/
+keyanshijian/
 ├── backend/            Java 17 + Spring Boot 3.3.5 / Spring Cloud 2023（Maven 多模块，10 个模块）
 │   ├── herbmind-common      横切基座：R<T> / PageResult / 全局异常
 │   ├── herbmind-contract    契约层：约 40 个 VO/DTO + 6 个 Feign Client（跨服务只认接口）
@@ -68,7 +70,9 @@ HerbMind/
 │   ├── herbmind-bff  :8090  前端唯一业务入口：/api/biz/**（Feign 转发 + 分区降级 + R<T> 包装）
 │   └── herbmind-gateway :8080  网关：Spring Cloud Gateway + JWT 全局过滤器
 ├── agent/              Python 3.11 + FastAPI :8091（域3 智能域：RAG + 工具调用 + SSE）
-├── frontend/           Vue 3 + TS strict + Vite（36 个页面 / 35 条路由，无 UI 库、无图表库）
+├── frontend/           Vue 3 + TS strict + Vite（18 个页面 / 19 条路由，无 UI 库、无图表库）
+├── mobile-view/        各页面真实运行截图（带登录态）
+├── index.html          离线单文件站点：双击即看，无需起服务（纯前端，接口功能需后端）
 ├── database/
 │   ├── pg/             DDL 00→04（initdb 自动执行，全部幂等）
 │   └── etl/            迁移 / 补录 / 向量 / 建图脚本（Python）
@@ -79,15 +83,20 @@ HerbMind/
 
 ## 平台能做什么（功能地图）
 
-前端 36 个页面分三块，**全部接真实接口**（治理三页仍是示意数据，见"已知缺口"）：
+首页 8 个模块，按学习动线排成两行（桌面 4×2，手机 2 列），**全部接真实接口**：
 
-| 块 | 页面 | 用户拿到的价值 |
-|---|---|---|
-| 读 | 首页 / 书架 / 典籍浏览 / 目录节点 / 方剂 / 医案 / 条文 | 按「章→节→类→单元」读原书；节内可搜原文、调字号主题、记住读到哪、方名悬停看组成 |
-| 查 | 检索工作台 / 结果分面 / 条文反向索引 / 智能问答 | 一个词同时搜方剂·医案·原文·条文，四腿召回按相关度融合；问答带引用卡与耗时 |
-| 练 | 练习台 / 答题 / 评分报告 / 案例盲盒 / 背诵打卡 / 错题本 / 学习路径 / 学习档案 | 出题→作答→规则评分（药味 F1 + 辨证 + 治法）→ 错题回流→ 路径推进 |
-| 研 | 科研工作台 / 数据导出 | 用药频次、证候分布、趋势，一键导出研究包 |
-| 图 | 图谱探索 / 方心子图 / 相似度地图 | 方剂↔药味邻接、组成相近方、全部方剂二维相似度地图 |
+| 序 | 模块 | 路由 | 用户拿到的价值 |
+|---|---|---|---|
+| 01 | 检索 | `/search` | 一个词同时搜方剂·医案·原文·条文，结构化筛选与自然语言语义检索任选或组合 |
+| 02 | 典籍 | `/library` | 按「章→节→类→单元」读原书，右侧就地显示正文，←/→ 翻页 |
+| 03 | 医案 | `/cases` | 按章节浏览 290 例真实医案，方名/证候筛选，点开读起病→辨证→处方→转归 |
+| 04 | 图谱 | `/graph` | 药味↔方剂邻接关系可视化，悬停高亮邻居，点击进方剂子图 |
+| 05 | 练习 | `/train` | 按章节+题型抽题，即时判分，交卷后给正确率圆环与逐题解析 |
+| 06 | 问答 | `/ask` | 自然语言提问，答案附典籍出处引用；模型不可用时自动降级为检索摘录 |
+| 07 | 换算 | `/convert` | 汉/宋/明清/现代度量衡单值换算 + 整方逐味折算与占比，纯前端计算 |
+| 08 | 我的 | `/me` | 登录状态、问答记录、个人设置 |
+
+> 换算模块纯前端计算，**离线单文件 `index.html` 里也能正常用**；其余模块依赖后端接口。
 
 ## 测试与验收
 
@@ -101,7 +110,7 @@ cd backend && mvn -q -pl svc-graph test       # 后端单测：目前只有 svc-
 
 > 域1 的实现与验收细节见 [`docs/A_内容域_交付说明.md`](docs/A_内容域_交付说明.md)。
 
-## 关键约定（详见 `../project_plan/15_团队分工与接口协作.md` 与 `09_API契约清单.md`）
+## 关键约定（接口契约见 `backend/herbmind-contract`）
 
 - **路由分层**：`/api/biz/**` 仅 BFF；`/api/agent/**` 仅 Agent；各 svc 只暴露 `/internal/**`。
 - **响应**：`R<T> = {code, msg, data}`；分页 `PageResult`。
