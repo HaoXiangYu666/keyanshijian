@@ -12,7 +12,17 @@ LOG="$ROOT/logs"
 mkdir -p "$LOG"
 
 # 本机 mvn 的 wrapper 可能损坏；直接用可用的 Maven 安装
-JAVA_HOME="${JAVA_HOME:-D:/software/IDEA/JDK/jdk-17.0.14+7}"
+# Java 依次探测：环境变量 → 本机实际安装位置 → PATH 里的 java
+if [ -z "${JAVA_HOME:-}" ] || [ ! -x "$JAVA_HOME/bin/java" ]; then
+  for cand in "D:/tools/jdk17" "D:/software/IDEA/JDK/jdk-17.0.14+7" "/c/Program Files/Java/jdk-17"; do
+    [ -x "$cand/bin/java" ] && { JAVA_HOME="$cand"; break; }
+  done
+fi
+if [ -z "${JAVA_HOME:-}" ] && command -v java >/dev/null 2>&1; then
+  JAVA_HOME="$(dirname "$(dirname "$(command -v java)")")"
+fi
+[ -x "${JAVA_HOME:-}/bin/java" ] || { echo "找不到可用的 JDK 17，请设置 JAVA_HOME"; exit 1; }
+echo "JAVA_HOME=$JAVA_HOME"
 JAR_IDENTITY="$ROOT/backend/svc-identity/target/svc-identity-2.0.0-SNAPSHOT.jar"
 JAR_CATALOG="$ROOT/backend/svc-catalog/target/svc-catalog-2.0.0-SNAPSHOT.jar"
 JAR_SEARCH="$ROOT/backend/svc-search/target/svc-search-2.0.0-SNAPSHOT.jar"

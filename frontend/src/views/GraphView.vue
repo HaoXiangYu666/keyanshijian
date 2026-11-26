@@ -24,11 +24,11 @@
     <span class="spacer" style="flex:1"></span>
     <button
       v-for="s in SHORTCUTS"
-      :key="s"
+      :key="s.name"
       class="chip clickable"
-      :class="{ sel: entity === s }"
-      @click="load(s)"
-    >{{ s }}</button>
+      :class="{ sel: entity === s.name }"
+      @click="load(s.name, s.label)"
+    >{{ s.name }}</button>
   </div>
 
   <div v-if="error" class="card" style="padding:12px 16px;margin-bottom:12px;border-left:3px solid #A32D2D">
@@ -55,7 +55,7 @@
     <GraphCanvas :nodes="shownNodes" :edges="shownEdges" :active-id="selectedId" @select="openNode" />
     <p v-if="!loading && data && !shownEdges.length" class="graph-hint">
       「{{ data.center.name }}」暂无关联药味。换一味药试试：
-      <button v-for="s in ['桂枝', '甘草', '麻黄']" :key="s" class="hint-link" @click="load(s)">{{ s }}</button>
+      <button v-for="s in ['桂枝', '甘草', '麻黄']" :key="s" class="hint-link" @click="load(s, 'Herb')">{{ s }}</button>
     </p>
   </div>
 
@@ -126,7 +126,14 @@ const TYPES: Array<{ label: NodeLabel; text: string }> = [
 /** 快捷入口：都是库里确有的实体，避免用户瞎猜导致 404 */
 // 默认从「桂枝」进入：药味→方剂的反向关系在库里最完整（31 首），进页面就有真实图谱。
 // 方剂方向的组方数据多数缺失，查「麻黄汤」只会看到一个孤立节点。
-const SHORTCUTS = ['桂枝', '甘草', '麻黄', '鳖甲煎丸', '薯蓣丸']
+// 带上类型：方剂名和药味名走的是两条查询路径，不带 label 会先吃一次 404 再回退
+const SHORTCUTS: Array<{ name: string; label: GraphLabel }> = [
+  { name: '桂枝', label: 'Herb' },
+  { name: '甘草', label: 'Herb' },
+  { name: '麻黄', label: 'Herb' },
+  { name: '鳖甲煎丸', label: 'Formula' },
+  { name: '薯蓣丸', label: 'Formula' }
+]
 
 const keyword = ref('桂枝')
 const entity = ref('桂枝')
@@ -150,8 +157,8 @@ function guessLabel(q: string): GraphLabel | undefined {
  * 4040「图中找不到实体」——那不是真没有，是类型没给对。这里在 404 且带后端 msg
  * （`isEntityMissing`）时按 `Herb` 再查一次；两个都没有才如实报错。
  */
-async function queryNeighbors(q: string): Promise<NeighborsVO> {
-  const label = guessLabel(q)
+async function queryNeighbors(q: string, hint?: GraphLabel): Promise<NeighborsVO> {
+  const label = hint ?? guessLabel(q)
   if (label) return getGraphNeighbors({ entity: q, label, hops: 1, limit: 50 })
   try {
     return await getGraphNeighbors({ entity: q, hops: 1, limit: 50 })
@@ -171,14 +178,14 @@ async function queryNeighbors(q: string): Promise<NeighborsVO> {
 /** 请求序号：只让最后一次查询的结果落地，避免慢请求覆盖新结果 */
 let loadSeq = 0
 
-async function load(name: string) {
+async function load(name: string, hint?: GraphLabel) {
   const q = name.trim()
   if (!q) return
   const seq = ++loadSeq
   loading.value = true
   error.value = ''
   try {
-    const result = await queryNeighbors(q)
+    const result = await queryNeighbors(q, hint)
     if (seq !== loadSeq) return
     data.value = result
     entity.value = q
@@ -228,7 +235,8 @@ function openNode(id: string) {
   selectedId.value = id
 }
 
-onMounted(() => load(entity.value))
+// 默认实体「桂枝」是药味，直接带 label 查，省掉一次必然 404 的方剂探测
+onMounted(() => load(entity.value, 'Herb'))
 </script>
 
 <style scoped>

@@ -17,6 +17,19 @@ cd keyanshijian
 
 > **组员请看 [`docs/新人上手指南.md`](docs/新人上手指南.md)**（零经验版，含常见问题）。
 
+### 本机（Windows · 已装好 PostgreSQL / Neo4j / JDK17）
+
+```bat
+:: 双击就行 —— 已在跑的会跳过，重复双击不会起两份
+启动全部.bat
+```
+
+跑完会打印电脑地址和手机局域网地址，账号 `demo` / `demo123456`。
+停止用 `停止全部.bat`（数据库会保留，下次启动更快）。
+日志在 `logs\`，脚本本体是 `scripts\start-all.bat`（换机器只改文件顶部四个路径变量）。
+
+### 从零装（Docker 方式 · 组员通用）
+
 ```bash
 # 1) 起中间件（PostgreSQL / Neo4j / Redis / Nacos）
 #    首次启动会自动建好 41 张表（database/pg/00→04）
@@ -36,6 +49,9 @@ bash scripts/init-data.sh /c/Users/你/Desktop/herbmind_data.sql
 #    Agent：cd agent && python run.py --reload  →  :8091（网关用 /api/agent/** 转发过来）
 #    前端：cd frontend && npm i && npm run dev  →  http://localhost:5173/
 ```
+
+> **页面报「服务未连接」** = 后端没起（前端右下角会出现提示条，带重试按钮）。
+> 本机双击 `启动全部.bat` 即可；Docker 方式按上面第 1、3 步重跑一遍。
 
 > **数据不重复消耗**：535 条向量已随快照分发，**任何人都不需要重新调用 Embedding API**。
 

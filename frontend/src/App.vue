@@ -15,11 +15,14 @@
   <main v-else>
     <RouterView />
   </main>
+
+  <ServiceStatus />
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import ServiceStatus from '@/components/ServiceStatus.vue'
 
 const route = useRoute()
 // 首页与登录页用整屏布局，其余页面统一显示返回键
