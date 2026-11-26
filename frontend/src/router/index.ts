@@ -107,12 +107,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '章节练习' }
   },
 
-  // ---- 算：工具 ----
+  // ---- 荐：每日一方 ----
   {
-    path: '/convert',
-    name: 'convert',
-    component: () => import('@/views/ConvertView.vue'),
-    meta: { title: '剂量换算' }
+    path: '/daily',
+    name: 'daily',
+    component: () => import('@/views/DailyView.vue'),
+    meta: { title: '每日一方' }
   },
 
   // ---- 问 ----

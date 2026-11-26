@@ -39,7 +39,7 @@
     <div class="section-title">
       <span class="bar"></span>
       <h2>开始学习</h2>
-      <p>找方证 → 读典籍 → 看医案 → 看关系 ｜ 练题目 → 问疑惑 → 算剂量 → 我的</p>
+      <p>找方证 → 读典籍 → 看医案 → 看关系 ｜ 练题目 → 问疑惑 → 每日一方 → 我的</p>
     </div>
     <section class="portal-grid" aria-label="核心功能">
       <RouterLink
@@ -75,7 +75,7 @@ function goSearch() {
 
 /**
  * 八个模块：4×2 大卡片。检索/典籍/医案/图谱（读得进去）
- * + 练习/问答/换算/我的（学得下去、用得起来），全部有真实数据支撑。
+ * + 练习/问答/每日/我的（学得下去、用得起来），全部有真实数据支撑。
  */
 const modules: Array<{
   name: string; to: string; color: string; paths: string[]; step: string; desc: string
@@ -98,9 +98,9 @@ const modules: Array<{
   { name: '问答', to: '/ask', step: '06 问', color: 'linear-gradient(135deg,#7D7AFF,#5E5CE6)',
     paths: ['M4 5h16v11H9l-5 4V5Z', 'M8 9h8', 'M8 12h5'],
     desc: '用自然语言提问，答案附典籍出处' },
-  { name: '换算', to: '/convert', step: '07 算', color: 'linear-gradient(135deg,#4FC3D9,#0E8FA8)',
-    paths: ['M4 8h13', 'M14 5l3 3-3 3', 'M20 16H7', 'M10 13l-3 3 3 3'],
-    desc: '古今度量衡折算，桂枝三两到底多少克' },
+  { name: '每日', to: '/daily', step: '07 荐', color: 'linear-gradient(135deg,#E0705F,#B23B2E)',
+    paths: ['M8 3v4', 'M16 3v4', 'M4 8h16', 'M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8', 'M9 14h6'],
+    desc: '每天一首方，配原文、主治与真实医案' },
   { name: '我的', to: '/me', step: '08 我', color: 'linear-gradient(135deg,#8A9BAE,#4F6072)',
     paths: ['M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z', 'M4 21c0-4 3.6-7 8-7s8 3 8 7'],
     desc: '登录状态、问答记录与个人设置' }

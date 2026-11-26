@@ -13,7 +13,7 @@ const pages = [
   { name: 'search', hash: '#/search', waitFor: '检索工作台' },
   { name: 'library', hash: '#/library', waitFor: '典籍浏览' },
   { name: 'cases', hash: '#/cases', waitFor: '医案研读' },
-  { name: 'convert', hash: '#/convert', waitFor: '古今剂量换算' },
+  { name: 'daily', hash: '#/daily', waitFor: '每日一方' },
   { name: 'graph', hash: '#/graph', waitFor: '知识图谱探索' },
   { name: 'train', hash: '#/train', waitFor: '方证练习' },
   { name: 'ask', hash: '#/ask', waitFor: '智能问答' },
