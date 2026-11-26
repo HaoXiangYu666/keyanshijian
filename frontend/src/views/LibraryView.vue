@@ -1,9 +1,8 @@
 <template>
-  <div class="crumb"><RouterLink to="/">首页</RouterLink> / 典籍</div>
-  <h1 class="serif" style="margin-bottom:6px">典籍浏览</h1>
-  <p class="muted" style="margin-bottom:14px">
-    按 章 → 节 → 类 → 单元 的层级阅读，仿古籍目录。点左侧任一节点，右侧就地显示内容，可用 ←/→ 翻页。
-  </p>
+  <div class="page-head">
+    <span class="ph-bar"></span>
+    <h1 class="serif">典籍浏览</h1>
+  </div>
 
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px">
     <span class="pill-tabs">

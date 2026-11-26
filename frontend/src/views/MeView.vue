@@ -1,6 +1,4 @@
 <template>
-  <div class="crumb"><RouterLink to="/">首页</RouterLink> / 我的</div>
-
   <div class="me-wrap">
     <section class="me-hero">
       <div class="avatar">{{ initial }}</div>

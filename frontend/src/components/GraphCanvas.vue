@@ -58,7 +58,7 @@
           :x="n.x"
           :y="n.y + 4"
           text-anchor="middle"
-          :font-size="n.r >= 28 ? 12 : 10.5"
+          :font-size="n.r >= 26 ? 12 : 10.5"
           :fill="NODE_STYLE[n.label].text"
           :opacity="focusId && !linked.has(n.id) ? 0.35 : 1"
           pointer-events="none"
@@ -124,10 +124,10 @@ function isEdgeOn(e: GEdge) {
 
 /**
  * 圆内放不下长名字：按半径估可用弦长（2·√(r²−(字号/2)²)）反推出能放几个汉字。
- * r=34 → 4 字；r=22~30 → 3 字；更小的圆 → 2 字。完整名在 <title> 与抽屉里。
+ * r≥26 → 4 字；r=22~25 → 3 字；更小的圆 → 2 字。完整名在 <title> 与抽屉里。
  */
 function shortName(name: string, r: number) {
-  const max = r >= 32 ? 4 : r >= 24 ? 3 : 2
+  const max = r >= 26 ? 4 : r >= 22 ? 3 : 2
   return name.length > max ? `${name.slice(0, max)}…` : name
 }
 </script>

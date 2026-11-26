@@ -13,7 +13,7 @@
     <h3>方剂加载失败</h3>
     <p class="muted" style="margin-top:6px">{{ error }}</p>
     <p class="muted" style="margin-top:10px">
-      请确认后端已启动（svc-catalog :8082 / BFF :8090），且已导入数据快照。
+      内容暂时加载不出来，请稍后重试。
     </p>
   </div>
 

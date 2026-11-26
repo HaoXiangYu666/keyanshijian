@@ -5,8 +5,10 @@
     条文反向索引
   </div>
 
-  <h1 class="serif" style="margin-bottom:6px">条文反向索引</h1>
-  <p class="muted" style="margin-bottom:18px">点条文看哪些方/案引用它；点方看相关条文。</p>
+  <div class="page-head">
+    <span class="ph-bar"></span>
+    <h1 class="serif">条文反向索引</h1>
+  </div>
 
   <div class="card" style="margin-bottom:18px">
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -32,7 +34,7 @@
     <h3>条文索引加载失败</h3>
     <p class="muted" style="margin-top:6px">{{ error }}</p>
     <p class="muted" style="margin-top:10px">
-      请确认后端已启动（svc-catalog :8082 / BFF :8090），且已导入数据快照。
+      内容暂时加载不出来，请稍后重试。
     </p>
     <button class="btn ghost sm" style="margin-top:12px" @click="load">重试</button>
   </div>

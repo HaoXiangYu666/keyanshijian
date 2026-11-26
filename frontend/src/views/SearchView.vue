@@ -1,8 +1,8 @@
 <template>
-  <div class="crumb"><RouterLink to="/">首页</RouterLink> / 检索</div>
-
-  <h1 class="serif" style="margin-bottom:6px">检索工作台</h1>
-  <p class="muted" style="margin-bottom:22px">结构化筛选 + 自然语言语义检索，两种方式任意组合。</p>
+  <div class="page-head">
+    <span class="ph-bar"></span>
+    <h1 class="serif">检索工作台</h1>
+  </div>
 
   <div class="card" style="margin-bottom:20px">
     <div class="hero-search" style="max-width:none">
@@ -14,9 +14,6 @@
         @keyup.enter="onSearch"
       />
       <button class="btn primary" @click="onSearch">检索</button>
-    </div>
-    <div class="muted" style="margin-top:10px;font-size:13px">
-      语义检索：向量召回 bge-m3 ⊕ 中文全文 pg_jieba，混合排序
     </div>
   </div>
 

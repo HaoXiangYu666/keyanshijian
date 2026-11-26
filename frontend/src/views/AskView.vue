@@ -1,15 +1,8 @@
 <template>
-  <div class="crumb"><RouterLink to="/">首页</RouterLink> / 智能问答</div>
-
-  <h1 class="serif" style="font-size:24px;margin-bottom:6px">
-    AI 智能问答
-    <span class="chip primary" style="font-size:12px;vertical-align:middle">LangChain · 带引用</span>
-  </h1>
-  <p class="muted" style="margin-bottom:16px">
-    走 <span class="mono">POST /api/agent/ask/sync</span>（同步）：pgvector 检索
-    <span class="mono">content_unit</span> → 大模型作答 → 返回引用。
-    <b>流式 <span class="mono">/api/agent/ask</span>（SSE）尚未实现</b>，所以逐字效果是前端本地呈现，答案与引用都是真实接口返回。
-  </p>
+  <div class="page-head">
+    <span class="ph-bar"></span>
+    <h1 class="serif">AI 智能问答</h1>
+  </div>
 
   <div class="grid chat-grid">
     <!-- 会话列表 -->
@@ -40,26 +33,6 @@
           <div v-if="m.role === 'me'" class="bubble me">{{ m.text }}</div>
 
           <div v-else>
-            <!-- 处理轨迹：真实耗时/token，不是编的工具事件 -->
-            <details v-if="m.usage && !m.error" class="toolcard">
-              <summary>
-                检索与生成 · 检索 {{ m.usage.retrieveMs }}ms / 生成 {{ m.usage.llmMs }}ms
-                <span class="muted">（同步接口一次返回，非流式）</span>
-              </summary>
-              <div class="toolstep">
-                <span class="k">retrieve</span>
-                <span class="muted">
-                  pgvector 相似度检索 → 命中 {{ m.citations?.length ?? 0 }} 条资料，耗时 {{ m.usage.retrieveMs }}ms
-                </span>
-              </div>
-              <div class="toolstep">
-                <span class="k">llm</span>
-                <span class="muted">
-                  生成耗时 {{ m.usage.llmMs }}ms · tokens {{ m.usage.promptTokens }} → {{ m.usage.completionTokens }}（共 {{ m.usage.totalTokens }}）
-                </span>
-              </div>
-            </details>
-
             <div
               class="bubble ai"
               :class="{ typing: isTyping(i) }"
@@ -67,7 +40,7 @@
             >{{ displayText(m, i) }}</div>
 
             <div v-if="m.degraded" class="chip warn" style="margin-top:8px">
-              降级回答（degraded=true）：资料不足或模型不可用，未经大模型生成
+              资料不足，以下为典籍原文摘录
             </div>
 
             <div v-if="m.citations?.length && !isTyping(i)" style="margin-top:12px">
@@ -164,18 +137,6 @@
         <p v-else class="muted" style="font-size:13px">
           引用命中示意图中的方剂后，这里会展示它的邻居小图。
         </p>
-        <p v-if="mini.nodes.length" class="muted" style="font-size:11.5px;margin-top:6px">
-          示意数据 · 待 <span class="mono">/api/agent/graph/**</span>
-        </p>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size:15px;margin-bottom:6px">跟诊剧本杀</h3>
-        <p class="muted" style="font-size:13px">让 Agent 扮患者多轮陈述，你来辨证处方。</p>
-        <button class="btn ghost sm" style="margin-top:10px" @click="coach">开始一局</button>
-        <p class="muted" style="font-size:11.5px;margin-top:6px">
-          <span class="mono">POST /api/agent/coach</span> 未实现
-        </p>
       </div>
     </aside>
   </div>
@@ -187,7 +148,6 @@ import { useRoute } from 'vue-router'
 import { askSync, errMsg, type Citation } from '@/api/agent'
 import { useConversations, type ChatMessage } from '@/composables/useConversations'
 import { NODE_STYLE, neighborSubgraph, resolveNodeId, type GNode } from '@/mock/domain3'
-import { toast } from '@/utils/toast'
 
 const route = useRoute()
 const { conversations, create, get, touch, renameFirst } = useConversations()
@@ -352,10 +312,6 @@ function typeLabel(refType: string) {
 
 function srcLink(c: Citation) {
   return `/${TYPE_PATH[c.refType] ?? 'case'}/${c.refId}`
-}
-
-function coach() {
-  toast('辨证教练 /api/agent/coach 尚未实现，先记这里')
 }
 
 function fmtTime(ts: number) {

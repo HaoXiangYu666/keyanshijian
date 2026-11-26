@@ -1,9 +1,8 @@
 <template>
-  <div class="crumb"><RouterLink to="/">首页</RouterLink> / 医案</div>
-  <h1 class="serif" style="margin-bottom:6px">医案研读</h1>
-  <p class="muted" style="margin-bottom:16px">
-    方剂看的是「法」，医案看的是「用法」。按章节挑一节，右侧列出该节全部医案，点开读原案全文——起病、辨证、处方、转归一目了然。
-  </p>
+  <div class="page-head">
+    <span class="ph-bar"></span>
+    <h1 class="serif">医案研读</h1>
+  </div>
 
   <div class="pill-tabs" style="margin-bottom:16px">
     <button

@@ -1,16 +1,12 @@
 <template>
-  <div class="crumb"><RouterLink to="/">首页</RouterLink> / 剂量换算</div>
-  <h1 class="serif" style="margin-bottom:6px">古今剂量换算</h1>
-  <p class="muted" style="margin-bottom:18px">
-    读《伤寒论》看到「桂枝三两」，到底是多少克？先选朝代与单位做单值换算，也可以在下方按整方录入，一次算出每味药的实际重量与占比。
-  </p>
+  <div class="page-head">
+    <span class="ph-bar"></span>
+    <h1 class="serif">古今剂量换算</h1>
+  </div>
 
   <!-- ===== 单值换算 ===== -->
   <div class="card">
-    <h3 style="margin-bottom:4px">单值换算</h3>
-    <p class="muted" style="font-size:13px;margin-bottom:16px">
-      汉制「一两」学界有 13.8g 与 15.6g 两说，可在下方切换；其余朝代取通行考据值。
-    </p>
+    <h3 style="margin-bottom:16px">单值换算</h3>
 
     <div class="era-tabs">
       <button
@@ -68,17 +64,17 @@
       </button>
     </p>
 
-    <p class="note">{{ era.source }}</p>
+    <details class="note">
+      <summary>参考依据</summary>
+      <p>{{ era.source }}</p>
+    </details>
   </div>
 
   <!-- ===== 整方折算 ===== -->
   <div class="card" style="margin-top:16px">
     <div class="preset-head">
       <div>
-        <h3 style="margin-bottom:4px">整方折算</h3>
-        <p class="muted" style="font-size:13px;margin:0">
-          按原方逐味录入，实时算出总重与各味占比。下方可一键载入两首经典方试算。
-        </p>
+        <h3>整方折算</h3>
       </div>
       <div class="preset-btns">
         <button v-for="p in PRESETS" :key="p.name" class="btn ghost sm" @click="loadPreset(p)">
@@ -136,7 +132,7 @@
   </div>
 
   <p class="disclaimer">
-    折算依据历代度量衡考据整理，同一朝代不同学者结论略有出入，仅供阅读古籍时估算参考，不作为临床处方依据。
+    折算依据历代度量衡考据整理，同一朝代不同学者结论略有出入，仅供读古籍时估算参考。
   </p>
 </template>
 
@@ -492,12 +488,39 @@ const shares = computed(() => {
 
 .note {
   margin-top: 14px;
-  padding: 10px 12px;
+  padding: 0;
   border-radius: 8px;
   background: rgba(47, 106, 79, 0.06);
   font-size: 12.5px;
   line-height: 1.65;
   color: #4b5563;
+}
+
+.note summary {
+  padding: 9px 12px;
+  cursor: pointer;
+  color: #6b7280;
+  list-style: none;
+  user-select: none;
+}
+
+.note summary::-webkit-details-marker {
+  display: none;
+}
+
+.note summary::before {
+  content: "＋";
+  margin-right: 6px;
+  font-size: 11px;
+}
+
+.note[open] summary::before {
+  content: "－";
+}
+
+.note p {
+  margin: 0;
+  padding: 0 12px 10px;
 }
 
 .preset-head {

@@ -1,12 +1,11 @@
 <template>
-  <div class="crumb"><RouterLink to="/">首页</RouterLink> / 图谱</div>
-
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px">
-    <div>
-      <h1 class="serif" style="font-size:24px">知识图谱探索</h1>
-      <p class="muted" style="margin-top:4px">
-        以「{{ data?.center.name ?? entity }}」为中心的 1 跳邻居 · 节点 {{ shownNodes.length }} 个 / 关系 {{ shownEdges.length }} 条
-      </p>
+  <div class="page-head">
+    <span class="ph-bar"></span>
+    <h1 class="serif">知识图谱探索</h1>
+    <div class="ph-extra">
+      <span class="chip">
+        {{ data?.center.name ?? entity }} · {{ shownNodes.length }} 节点 / {{ shownEdges.length }} 关系
+      </span>
     </div>
   </div>
 
@@ -52,12 +51,15 @@
     </span>
   </div>
 
-  <div class="card" style="padding:0;overflow:hidden">
+  <div class="card graph-box">
     <GraphCanvas :nodes="shownNodes" :edges="shownEdges" :active-id="selectedId" @select="openNode" />
+    <p v-if="!loading && data && !shownEdges.length" class="graph-hint">
+      「{{ data.center.name }}」暂无关联药味。换一味药试试：
+      <button v-for="s in ['桂枝', '甘草', '麻黄']" :key="s" class="hint-link" @click="load(s)">{{ s }}</button>
+    </p>
   </div>
 
   <p class="muted" style="margin-top:10px">
-    数据来源：<span class="mono">svc-graph</span> → Neo4j（节点 {{ data?.nodes.length ?? 0 }} 个邻居，含中心）。
     点击节点查看详情；悬停高亮其邻居。
   </p>
 
@@ -122,10 +124,12 @@ const TYPES: Array<{ label: NodeLabel; text: string }> = [
 ]
 
 /** 快捷入口：都是库里确有的实体，避免用户瞎猜导致 404 */
-const SHORTCUTS = ['麻黄汤', '桂枝汤', '葛根汤', '麻黄', '桂枝']
+// 默认从「桂枝」进入：药味→方剂的反向关系在库里最完整（31 首），进页面就有真实图谱。
+// 方剂方向的组方数据多数缺失，查「麻黄汤」只会看到一个孤立节点。
+const SHORTCUTS = ['桂枝', '甘草', '麻黄', '鳖甲煎丸', '薯蓣丸']
 
-const keyword = ref('麻黄汤')
-const entity = ref('麻黄汤')
+const keyword = ref('桂枝')
+const entity = ref('桂枝')
 const data = ref<NeighborsVO | null>(null)
 const loading = ref(false)
 const error = ref('')
@@ -226,3 +230,48 @@ function openNode(id: string) {
 
 onMounted(() => load(entity.value))
 </script>
+
+<style scoped>
+.graph-box { position: relative; padding: 0; overflow: hidden; }
+
+/* 图里只有孤立节点时给一条可点的建议，避免一整块空白让人觉得坏了 */
+.graph-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-1);
+  font-size: 13px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.hint-link {
+  border: 0;
+  background: none;
+  color: var(--primary-deep);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 3px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 620px) {
+  .graph-hint {
+    white-space: normal;
+    width: calc(100% - 28px);
+    justify-content: center;
+    flex-wrap: wrap;
+    bottom: 12px;
+  }
+}
+</style>

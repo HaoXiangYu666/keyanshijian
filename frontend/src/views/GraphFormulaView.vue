@@ -40,8 +40,7 @@
         <GraphCanvas :nodes="graph.nodes" :edges="graph.edges" :active-id="selectedId" @select="openNode" />
       </div>
       <p class="muted" style="margin-top:10px">
-        数据来源：<span class="mono">svc-graph /internal/graph/formula/{id}</span>
-        （中心方与药味顺序取自 PG，图为 Neo4j 组成关系）。
+        点击节点查看详情；悬停高亮其相邻药味。
       </p>
     </div>
 

@@ -38,7 +38,7 @@ const MAX_RY = CANVAS_H / 2 - 52
 const INNER_SCALE = 0.52
 
 /** 相邻两个节点之间至少空出的像素，避免圆挨圆糊成一条粗环 */
-const NODE_GAP = 14
+const NODE_GAP = 9
 
 /** 圆的最小半径：再小名字就没法看了，宁可挤一点 */
 const MIN_NODE_R = 9
@@ -112,7 +112,7 @@ export function layoutNeighbors(data: NeighborsVO): { nodes: GNode[]; edges: GEd
   const herbs = data.nodes.filter((n) => n.label === 'Herb')
   const others = data.nodes.filter((n) => n.label !== 'Herb')
 
-  const nodes: GNode[] = [toGNode(data.center, cx, cy, nodeRadius(data.center.label))]
+  const nodes: GNode[] = [toGNode(data.center, cx, cy, Math.max(nodeRadius(data.center.label), 32))]
 
   if (others.length === 0) {
     // 只有一类邻居：直接摊满外圈，别都挤在内圈

@@ -1,9 +1,9 @@
 <template>
   <div class="quiz">
     <div class="quiz-head">
-      <div>
-        <h1>方证练习</h1>
-        <p class="muted">按章节选题，即时判分，答完汇总。真实典籍数据。</p>
+      <div class="page-head" style="margin:0">
+        <span class="ph-bar"></span>
+        <h1 class="serif">方证练习</h1>
       </div>
       <div class="score-pill" v-if="answeredCount">正确 {{ correctCount }}/{{ answeredCount }}</div>
     </div>
