@@ -44,7 +44,10 @@ export default defineConfig({
     }
   },
   server: {
+    // 0.0.0.0：手机等局域网设备可用 http://<本机IP>:5173 直接访问
+    host: '0.0.0.0',
     port: 5173,
+    strictPort: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

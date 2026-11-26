@@ -6,11 +6,14 @@ const EDGE = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
 const BASE = 'http://127.0.0.1:5173'
 const OUT = 'D:/keyanshijian/mobile-view'
 const TOKEN = process.argv[2] || ''
+const STAMP = process.argv[3] || ''
 
 const pages = [
   { name: 'home', hash: '#/', waitFor: '开始学习' },
   { name: 'search', hash: '#/search', waitFor: '检索工作台' },
   { name: 'library', hash: '#/library', waitFor: '典籍浏览' },
+  { name: 'cases', hash: '#/cases', waitFor: '医案研读' },
+  { name: 'convert', hash: '#/convert', waitFor: '古今剂量换算' },
   { name: 'graph', hash: '#/graph', waitFor: '知识图谱探索' },
   { name: 'train', hash: '#/train', waitFor: '方证练习' },
   { name: 'ask', hash: '#/ask', waitFor: '智能问答' },
@@ -50,7 +53,7 @@ const pages = [
     try { await page.waitForNetworkIdle({ idleTime: 800, timeout: 10000 }) } catch (e) {}
     await new Promise((r) => setTimeout(r, 1500))
 
-    const file = path.join(OUT, `page-${p.name}.png`)
+    const file = path.join(OUT, `page-${p.name}${STAMP}.png`)
     await page.screenshot({ path: file })
     const txt = await page.evaluate(() => document.body.innerText.slice(0, 70).replace(/\s+/g, ' '))
     console.log(`${p.name.padEnd(9)} -> ${file}\n           ${txt}`)

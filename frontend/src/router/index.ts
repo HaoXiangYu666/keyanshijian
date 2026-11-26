@@ -53,6 +53,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '医案详情' }
   },
   {
+    path: '/cases',
+    name: 'cases',
+    component: () => import('@/views/CaseLibraryView.vue'),
+    meta: { title: '医案研读' }
+  },
+  {
     path: '/quote/:id',
     name: 'quote',
     component: () => import('@/views/QuoteView.vue'),
@@ -99,6 +105,14 @@ const routes: RouteRecordRaw[] = [
     name: 'train',
     component: () => import('@/views/TrainView.vue'),
     meta: { title: '章节练习' }
+  },
+
+  // ---- 算：工具 ----
+  {
+    path: '/convert',
+    name: 'convert',
+    component: () => import('@/views/ConvertView.vue'),
+    meta: { title: '剂量换算' }
   },
 
   // ---- 问 ----
